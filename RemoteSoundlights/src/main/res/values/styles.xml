@@ -1,0 +1,6 @@
+<resources>
+    <style name="AppBaseTheme" parent="android:Theme.NoTitleBar"/>
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:textSize">20sp</item>
+    </style>
+</resources>
