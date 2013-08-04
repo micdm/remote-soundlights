@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 
 import com.micdm.remotesoundlights.ReceiverThread;
 import com.micdm.remotesoundlights.SenderThread;
