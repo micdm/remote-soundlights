@@ -1,4 +1,6 @@
-package com.micdm.remotesoundlights;
+package com.micdm.remotesoundlights.net;
+
+import com.micdm.remotesoundlights.utils.Logger;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,6 +13,7 @@ public class SenderThread extends Thread {
     private final int QUEUE_SIZE = 100;
 
     private boolean isActive = true;
+    private DatagramSocket socket;
     private InetAddress address;
     private int port;
 
@@ -31,7 +34,7 @@ public class SenderThread extends Thread {
         }
     }
 
-    private void sendNext(DatagramSocket socket) {
+    private void sendNext() {
         byte[] data = queue.poll();
         if (data == null) {
             return;
@@ -40,15 +43,15 @@ public class SenderThread extends Thread {
             DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
             socket.send(packet);
         } catch (IOException e) {
-
+            Logger.debug("Exception occurred during packet send");
         }
     }
 
     @Override
     public void run() {
-        DatagramSocket socket = getSocket();
+        socket = getSocket();
         while (isActive) {
-            sendNext(socket);
+            sendNext();
             try {
                 sleep(1);
             } catch (InterruptedException e) {
@@ -63,5 +66,6 @@ public class SenderThread extends Thread {
 
     public void cancel() {
         isActive = false;
+        socket.close();
     }
 }

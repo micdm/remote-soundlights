@@ -4,7 +4,4 @@
     <string name="select_mode_question">Who do you want to be?</string>
     <string name="select_mode_answer_boss">A party boss</string>
     <string name="select_mode_answer_guest">A party guest</string>
-    <string name="boss_waiting_for_first_guest">Waiting for the first guest…</string>
-    <string name="guest_searching_for_party">Searching for a party…</string>
-    <string name="guest_connecting">Entering to the party…</string>
 </resources>

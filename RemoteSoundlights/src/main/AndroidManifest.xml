@@ -24,9 +24,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.BossActivity"
-            android:screenOrientation="landscape"/>
+            android:name=".activities.boss.BossActivity">
+        </activity>
         <activity
-            android:name=".activities.GuestActivity"/>
+            android:name=".activities.GuestActivity">
+        </activity>
     </application>
 </manifest>

@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class Logger {
 
-    private static final String TAG = "com.micdm.blueflash";
+    private static final String TAG = "com.micdm.remotesoundlights";
 
     public static void debug(String message) {
         Log.d(TAG, message);
