@@ -15,13 +15,11 @@ public class SenderThread extends Thread {
     private boolean isActive = true;
     private DatagramSocket socket;
     private InetAddress address;
-    private int port;
 
     private ArrayBlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(QUEUE_SIZE);
 
-    public SenderThread(InetAddress address, int port) {
+    public SenderThread(InetAddress address) {
         this.address = address;
-        this.port = port;
     }
 
     private DatagramSocket getSocket() {
@@ -40,7 +38,7 @@ public class SenderThread extends Thread {
             return;
         }
         try {
-            DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+            DatagramPacket packet = new DatagramPacket(data, data.length, address, NetParams.PORT);
             socket.send(packet);
         } catch (IOException e) {
             Logger.debug("Exception occurred during packet send");

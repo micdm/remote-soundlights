@@ -6,7 +6,6 @@ import android.view.Display;
 import com.micdm.remotesoundlights.activities.boss.Analyzer;
 import com.micdm.remotesoundlights.data.GainListPacket;
 import com.micdm.remotesoundlights.data.GainListPacketBuilder;
-import com.micdm.remotesoundlights.net.NetParams;
 import com.micdm.remotesoundlights.net.ReceiverThread;
 import com.micdm.remotesoundlights.utils.Logger;
 
@@ -24,6 +23,7 @@ import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
+import org.andengine.util.color.ColorUtils;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public abstract class VisualizationActivity extends SimpleBaseGameActivity {
 
         private TextureRegion getCircleSpriteRegion() {
             try {
-                BitmapTexture texture = (BitmapTexture) getTextureManager().getTexture("circle", getAssets(), "gfx/circle.png");
+                BitmapTexture texture = (BitmapTexture) getTextureManager().getTexture("circle", getAssets(), "gfx/circles.png");
                 return TextureRegionFactory.extractFromTexture(texture);
             } catch (IOException e) {
                 return null;
@@ -81,12 +81,12 @@ public abstract class VisualizationActivity extends SimpleBaseGameActivity {
         private Color getCircleColor(Analyzer.LEVEL level) {
             int number = level.getNumber();
             if (number >= 5) {
-                return new Color(1, 1, 1);
+                return ColorUtils.convertARGBPackedIntToColor(0xFF2D7395);
             }
             if (number >= 2) {
-                return new Color(0, 1, 0);
+                return ColorUtils.convertARGBPackedIntToColor(0xFF37952D);
             }
-            return new Color(1, 0, 0);
+            return ColorUtils.convertARGBPackedIntToColor(0xFF952D2D);
         }
 
         @Override
@@ -134,92 +134,18 @@ public abstract class VisualizationActivity extends SimpleBaseGameActivity {
         }
     }
 
-    private class BarVisualizer implements Visualizer {
-
-        private final int BAR_COUNT = 7;
-        private final float MAX_SIZE = 255;
-
-        private TextureRegion getBarSpriteRegion() {
-            try {
-                BitmapTexture texture = (BitmapTexture) getTextureManager().getTexture("bar", getAssets(), "gfx/bar.png");
-                return TextureRegionFactory.extractFromTexture(texture);
-            } catch (IOException e) {
-                return null;
-            }
-        }
-
-        private Sprite getBarSprite(int number) {
-            Scene scene = getEngine().getScene();
-            if (scene == null) {
-                return null;
-            }
-            if (scene.getChildCount() == 0) {
-                Camera camera = getEngine().getCamera();
-                float width = camera.getWidth() / BAR_COUNT;
-                TextureRegion region = getBarSpriteRegion();
-                for (int i = 0; i < BAR_COUNT; i += 1) {
-                    float x = width * i;
-                    Sprite sprite = new Sprite(x, 0, width, 0, region, getVertexBufferObjectManager());
-                    scene.attachChild(sprite);
-                }
-            }
-            return (Sprite) scene.getChildByIndex(number);
-        }
-
-        private void setBarSpriteSize(int number, float size) {
-            Sprite sprite = getBarSprite(number);
-            if (sprite == null) {
-                return;
-            }
-            Camera camera = getEngine().getCamera();
-            sprite.setHeight(camera.getHeight() / MAX_SIZE * size);
-        }
-
-        @Override
-        public void visualize(Analyzer.Gain[] gains) {
-            for (Analyzer.Gain gain: gains) {
-                setBarSpriteSize(gain.getLevel().getNumber(), gain.getValue());
-            }
-        }
-
-        @Override
-        public IUpdateHandler getSpriteHandler() {
-            return new IUpdateHandler() {
-
-                private final float PIXEL_PER_SECOND = 100;
-
-                @Override
-                public void onUpdate(float elapsed) {
-                    Scene scene = getEngine().getScene();
-                    float size = elapsed * PIXEL_PER_SECOND;
-                    for (int i = scene.getChildCount() - 1; i >= 0; i -= 1) {
-                        Sprite sprite = (Sprite) scene.getChildByIndex(i);
-                        sprite.setHeight(Math.max(sprite.getHeight() - size, 0));
-                    }
-                }
-
-                @Override
-                public void reset() {}
-            };
-        }
-    }
-
-    private Visualizer Visualizer;
+    private Visualizer visualizer;
     private ReceiverThread receiver;
 
-    private void setupVisualizer() {
-        Visualizer = new CircleVisualizer();
-    }
-
     private void setupReceiver() {
-        receiver = new ReceiverThread(NetParams.PORT, new ReceiverThread.OnDataListener() {
+        receiver = new ReceiverThread(new ReceiverThread.OnDataListener() {
             @Override
             public void onData(byte[] data) {
                 final GainListPacket packet = GainListPacketBuilder.decode(data);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Visualizer.visualize(packet.getGains());
+                        visualizer.visualize(packet.getGains());
                     }
                 });
             }
@@ -230,7 +156,7 @@ public abstract class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupVisualizer();
+        visualizer = new CircleVisualizer();
     }
 
     @Override
@@ -253,7 +179,7 @@ public abstract class VisualizationActivity extends SimpleBaseGameActivity {
     protected Scene onCreateScene() {
         Scene scene = new Scene();
         scene.setBackground(new Background(0, 0, 0));
-        getEngine().registerUpdateHandler(Visualizer.getSpriteHandler());
+        getEngine().registerUpdateHandler(visualizer.getSpriteHandler());
         getEngine().registerUpdateHandler(new AverageFPSCounter() {
             @Override
             protected void onHandleAverageDurationElapsed(float fps) {

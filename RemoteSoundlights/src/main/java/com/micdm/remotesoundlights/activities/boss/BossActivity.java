@@ -36,12 +36,12 @@ public class BossActivity extends VisualizationActivity {
     }
 
     private void setupSender() {
-        sender = new SenderThread(getBroadcastAddress(), NetParams.PORT);
+        sender = new SenderThread(getBroadcastAddress());
         sender.start();
     }
 
     private void setupAnalyzer() {
-        analyzer = new Analyzer(Analyzer.TYPE.NORMAL, new Analyzer.OnGainListener() {
+        analyzer = new Analyzer(new Analyzer.OnGainListener() {
             @Override
             public void onGain(Analyzer.Gain[] gains) {
                 GainListPacket packet = new GainListPacket(gains);

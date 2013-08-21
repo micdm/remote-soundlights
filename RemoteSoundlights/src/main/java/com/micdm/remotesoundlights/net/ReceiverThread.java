@@ -14,17 +14,15 @@ public class ReceiverThread extends Thread {
 
     private boolean isActive = true;
     private DatagramSocket socket;
-    private int port;
     private OnDataListener listener;
 
-    public ReceiverThread(int port, OnDataListener listener) {
-        this.port = port;
+    public ReceiverThread(OnDataListener listener) {
         this.listener = listener;
     }
 
     private DatagramSocket getSocket() {
         try {
-            return new DatagramSocket(port);
+            return new DatagramSocket(NetParams.PORT);
         } catch (IOException e) {
             return null;
         }

@@ -1,6 +1,7 @@
 package com.micdm.remotesoundlights.activities.boss;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Analyzer {
 
@@ -27,11 +28,6 @@ public class Analyzer {
         }
     }
 
-    public static enum TYPE {
-        NORMAL,
-        AMPLIFIED
-    }
-
     public static enum LEVEL {
         LOW_BASS(0),
         HIGH_BASS(1),
@@ -52,33 +48,62 @@ public class Analyzer {
         }
     }
 
+    private static class BeatDetector {
+
+        private static final int MAX_HISTORY_SIZE = 1000;
+        private static final int DETECTION_THRESHOLD = 5;
+
+        private LinkedList<Double> history = new LinkedList<Double>();
+        private int detections;
+
+        private double getAverage() {
+            double average = 0;
+            for (double value: history) {
+                average += value;
+            }
+            average /= history.size();
+            return average;
+        }
+
+        public boolean addEnergy(double energy) {
+            history.add(energy);
+            if (history.size() > MAX_HISTORY_SIZE) {
+                history.poll();
+            }
+            double average = getAverage();
+            if (energy > average * 1.3) {
+                detections += 1;
+            }
+            if (detections == DETECTION_THRESHOLD) {
+                detections = 0;
+                return true;
+            }
+            return false;
+        }
+    }
+
     private static final int[] FREQUENCIES = {10, 80, 200, 500, 2500, 500, 10000, 20000};
 
-    private int[] prev;
-    private TYPE type;
+    private BeatDetector[] detectors = new BeatDetector[LEVEL.values().length];
     private OnGainListener listener;
 
-    public Analyzer(TYPE type, OnGainListener listener) {
-        this.type = type;
+    public Analyzer(OnGainListener listener) {
+        initDetectors();
         this.listener = listener;
     }
 
-    private int getFrequencyLevel(byte real, byte imaginary) {
-        if (real == 0 && imaginary == 0) {
-            return 0;
+    private void initDetectors() {
+        for (int i = 0; i < detectors.length; i += 1) {
+            detectors[i] = new BeatDetector();
         }
-        double magnitude = Math.sqrt(Math.pow(real, 2) + Math.pow(imaginary, 2));
-        if (type == TYPE.NORMAL) {
-            return (int) Math.min(magnitude, 0xFF);
-        }
-        if (type == TYPE.AMPLIFIED) {
-            return Math.min((int) Math.floor(100 * Math.log10(magnitude)), 0xFF);
-        }
-        return 0;
     }
 
-    private int[] getFrequencyLevels(byte[] data) {
-        int[] levels = new int[data.length / 2];
+    private double getFrequencyLevel(byte real, byte imaginary) {
+        return Math.sqrt(Math.pow(real, 2) + Math.pow(imaginary, 2));
+    }
+
+    private double[] getFrequencyLevels(byte[] data) {
+        double[] levels = new double[data.length / 2];
         levels[0] = getFrequencyLevel(data[0], (byte) 0);
         for (int i = 1; i < levels.length - 1; i += 1) {
             levels[i] = getFrequencyLevel(data[i * 2], data[i * 2 + 1]);
@@ -87,38 +112,31 @@ public class Analyzer {
         return levels;
     }
 
-    private int getMaxLevel(int[] levels, int minFrequency, int maxFrequency) {
-        double step = (float) FREQUENCIES[FREQUENCIES.length - 1] / levels.length;
+    private double getEnergy(double[] levels, int minFrequency, int maxFrequency) {
+        double step = FREQUENCIES[FREQUENCIES.length - 1] / levels.length;
         int begin = (int) (minFrequency / step);
         int end = (int) (maxFrequency / step);
-        int max = 0;
+        double energy = 0;
         for (int i = begin; i < end; i += 1) {
-            max = Math.max(max, levels[i]);
+            energy += Math.max(Math.log(levels[i]), 0);
         }
-        return max;
+        return energy;
     }
 
-    private int[] getCompressedFrequencyLevels(int[] levels) {
-        int[] compressed = new int[FREQUENCIES.length - 1];
+    private double[] getEnergies(double[] levels) {
+        double[] energies = new double[FREQUENCIES.length - 1];
         for (int i = 0; i < FREQUENCIES.length - 1; i += 1) {
-            compressed[i] = getMaxLevel(levels, FREQUENCIES[i], FREQUENCIES[i + 1]);
+            energies[i] = getEnergy(levels, FREQUENCIES[i], FREQUENCIES[i + 1]);
         }
-        return compressed;
+        return energies;
     }
 
-    private boolean isGain(int[] compressed, int index) {
-        if (prev == null || prev[index] == 0) {
-            return compressed[index] != 0;
-        }
-        return (float) compressed[index] / prev[index] > 4;
-    }
-
-    private Gain[] getGains(int[] compressed) {
+    private Gain[] getGains(double[] energies) {
         ArrayList<Gain> gains = new ArrayList<Gain>();
         LEVEL[] levels = LEVEL.values();
         for (int i = 0; i < levels.length; i += 1) {
-            if (isGain(compressed, i)) {
-                gains.add(new Gain(levels[i], compressed[i]));
+            if (detectors[i].addEnergy(energies[i])) {
+                gains.add(new Gain(levels[i], (int) energies[i]));
             }
         }
         Gain[] content = new Gain[gains.size()];
@@ -126,12 +144,11 @@ public class Analyzer {
     }
 
     public void setFftData(byte[] data) {
-        int[] levels = getFrequencyLevels(data);
-        int[] compressed = getCompressedFrequencyLevels(levels);
-        Gain[] gains = getGains(compressed);
+        double[] levels = getFrequencyLevels(data);
+        double[] energies = getEnergies(levels);
+        Gain[] gains = getGains(energies);
         if (gains.length != 0) {
             listener.onGain(gains);
         }
-        prev = compressed;
     }
 }
