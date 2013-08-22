@@ -50,7 +50,8 @@ public class Analyzer {
 
     private static class BeatDetector {
 
-        private static final int MAX_HISTORY_SIZE = 1000;
+        private static final int MAX_HISTORY_SIZE = 200;
+        private static final double MAGICK = 1.3;
         private static final int DETECTION_THRESHOLD = 5;
 
         private LinkedList<Double> history = new LinkedList<Double>();
@@ -64,7 +65,7 @@ public class Analyzer {
                 sum -= history.poll();
             }
             double average = sum / history.size();
-            if (energy > average * 1.3) {
+            if (energy > average * MAGICK) {
                 detections += 1;
             }
             if (detections == DETECTION_THRESHOLD) {

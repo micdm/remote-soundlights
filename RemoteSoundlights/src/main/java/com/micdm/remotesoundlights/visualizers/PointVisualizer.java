@@ -32,22 +32,24 @@ public class PointVisualizer implements Visualizer {
         @Override
         public void onUpdate(float elapsed) {
             Scene scene = engine.getScene();
-            float alpha = elapsed * ALPHA_PER_SECOND;
-            float size = elapsed * PIXEL_PER_SECOND;
-            float degrees = elapsed * DEGREES_PER_SECOND;
+            float fade = elapsed * ALPHA_PER_SECOND;
+            float growth = elapsed * PIXEL_PER_SECOND;
+            float angle = elapsed * DEGREES_PER_SECOND;
             for (int i = scene.getChildCount() - 1; i >= 0; i -= 1) {
                 Sprite sprite = (Sprite) scene.getChildByIndex(i);
-                sprite.setAlpha(sprite.getAlpha() - alpha);
-                if (sprite.getAlpha() < 0.01) {
+                float alpha = sprite.getAlpha();
+                if (alpha < fade) {
                     scene.detachChild(sprite);
                     continue;
                 }
-                sprite.setX(sprite.getX() - size / 2);
-                sprite.setWidth(sprite.getWidth() + size);
-                sprite.setY(sprite.getY() - size / 2);
-                sprite.setHeight(sprite.getHeight() + size);
+                sprite.setAlpha(alpha - fade);
+                sprite.setX(sprite.getX() - growth / 2);
+                sprite.setWidth(sprite.getWidth() + growth);
+                sprite.setY(sprite.getY() - growth / 2);
+                sprite.setHeight(sprite.getHeight() + growth);
                 sprite.setRotationCenter(sprite.getWidth() / 2, sprite.getHeight() / 2);
-                sprite.setRotation(sprite.getRotation() + degrees);
+                float rotation = sprite.getRotation();
+                sprite.setRotation((rotation > 0) ? rotation + angle : rotation - angle);
             }
         }
 
@@ -74,6 +76,45 @@ public class PointVisualizer implements Visualizer {
         }
     }
 
+    private float getSize(Analyzer.LEVEL level) {
+        Camera camera = engine.getCamera();
+        if (level == Analyzer.LEVEL.HIGH_HIGH) {
+            return camera.getWidth() * 0.1f;
+        }
+        if (level == Analyzer.LEVEL.LOW_HIGH) {
+            return camera.getWidth() * 0.125f;
+        }
+        if (level == Analyzer.LEVEL.HIGH_MIDDLE) {
+            return camera.getHeight() * 0.25f;
+        }
+        if (level == Analyzer.LEVEL.MEDIUM_MIDDLE) {
+            return camera.getHeight() * 0.33f;
+        }
+        if (level == Analyzer.LEVEL.LOW_MIDDLE) {
+            return camera.getHeight() * 0.5f;
+        }
+        if (level == Analyzer.LEVEL.HIGH_BASS) {
+            return camera.getHeight() * 1.2f;
+        }
+        if (level == Analyzer.LEVEL.LOW_BASS) {
+            return camera.getWidth() * 1.5f;
+        }
+        throw new RuntimeException("Unknow level " + level);
+    }
+
+    private Color getColor(Analyzer.LEVEL level) {
+        if (level == Analyzer.LEVEL.LOW_HIGH || level == Analyzer.LEVEL.HIGH_HIGH) {
+            return ColorUtils.convertARGBPackedIntToColor(0xFF2D7395);
+        }
+        if (level == Analyzer.LEVEL.LOW_MIDDLE || level == Analyzer.LEVEL.MEDIUM_MIDDLE || level == Analyzer.LEVEL.HIGH_MIDDLE) {
+            return ColorUtils.convertARGBPackedIntToColor(0xFF37952D);
+        }
+        if (level == Analyzer.LEVEL.LOW_BASS || level == Analyzer.LEVEL.HIGH_BASS) {
+            return ColorUtils.convertARGBPackedIntToColor(0xFF952D2D);
+        }
+        throw new RuntimeException("Unknown level " + level);
+    }
+
     private void addSprite(float size, Color color) {
         Camera camera = engine.getCamera();
         if (camera == null) {
@@ -91,30 +132,8 @@ public class PointVisualizer implements Visualizer {
         float y = (float) (Math.random() * (camera.getHeight() - size));
         Sprite sprite = new Sprite(x, y, size, size, region, engine.getVertexBufferObjectManager());
         sprite.setColor(color);
+        sprite.setRotation((float) (-180 + Math.random() * 360));
         scene.attachChild(sprite);
-    }
-
-    private float getSize(Analyzer.LEVEL level) {
-        Camera camera = engine.getCamera();
-        int number = level.getNumber();
-        if (number >= 5) {
-            return camera.getWidth() / 10;
-        }
-        if (number >= 2) {
-            return camera.getHeight() / 2;
-        }
-        return camera.getWidth() * 1.5f;
-    }
-
-    private Color getColor(Analyzer.LEVEL level) {
-        int number = level.getNumber();
-        if (number >= 5) {
-            return ColorUtils.convertARGBPackedIntToColor(0xFF2D7395);
-        }
-        if (number >= 2) {
-            return ColorUtils.convertARGBPackedIntToColor(0xFF37952D);
-        }
-        return ColorUtils.convertARGBPackedIntToColor(0xFF952D2D);
     }
 
     @Override
