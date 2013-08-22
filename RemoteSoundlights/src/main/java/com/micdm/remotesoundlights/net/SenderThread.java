@@ -10,13 +10,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class SenderThread extends Thread {
 
-    private final int QUEUE_SIZE = 100;
+    private static final int QUEUE_SIZE = 100;
 
     private boolean isActive = true;
     private DatagramSocket socket;
-    private InetAddress address;
-
     private ArrayBlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(QUEUE_SIZE);
+    private InetAddress address;
 
     public SenderThread(InetAddress address) {
         this.address = address;
@@ -59,7 +58,7 @@ public class SenderThread extends Thread {
     }
 
     public void send(byte[] data) {
-        queue.add(data);
+        queue.offer(data);
     }
 
     public void cancel() {

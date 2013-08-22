@@ -54,23 +54,16 @@ public class Analyzer {
         private static final int DETECTION_THRESHOLD = 5;
 
         private LinkedList<Double> history = new LinkedList<Double>();
+        private double sum;
         private int detections;
-
-        private double getAverage() {
-            double average = 0;
-            for (double value: history) {
-                average += value;
-            }
-            average /= history.size();
-            return average;
-        }
 
         public boolean addEnergy(double energy) {
             history.add(energy);
+            sum += energy;
             if (history.size() > MAX_HISTORY_SIZE) {
-                history.poll();
+                sum -= history.poll();
             }
-            double average = getAverage();
+            double average = sum / history.size();
             if (energy > average * 1.3) {
                 detections += 1;
             }
@@ -99,7 +92,7 @@ public class Analyzer {
     }
 
     private double getFrequencyLevel(byte real, byte imaginary) {
-        return Math.sqrt(Math.pow(real, 2) + Math.pow(imaginary, 2));
+        return Math.sqrt(real * real + imaginary * imaginary);
     }
 
     private double[] getFrequencyLevels(byte[] data) {
@@ -118,7 +111,10 @@ public class Analyzer {
         int end = (int) (maxFrequency / step);
         double energy = 0;
         for (int i = begin; i < end; i += 1) {
-            energy += Math.max(Math.log(levels[i]), 0);
+            if (levels[i] < 1) {
+                continue;
+            }
+            energy += Math.log(levels[i]);
         }
         return energy;
     }

@@ -8,7 +8,6 @@ import android.os.Bundle;
 import com.micdm.remotesoundlights.activities.VisualizationActivity;
 import com.micdm.remotesoundlights.data.GainListPacket;
 import com.micdm.remotesoundlights.data.GainListPacketBuilder;
-import com.micdm.remotesoundlights.net.NetParams;
 import com.micdm.remotesoundlights.net.SenderThread;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ import java.net.InetAddress;
 public class BossActivity extends VisualizationActivity {
 
     private SenderThread sender;
-    private Analyzer analyzer;
+    private AnalyzerThread analyzer;
     private VisualizerWatcher watcher;
 
     private InetAddress getBroadcastAddress() {
@@ -41,13 +40,14 @@ public class BossActivity extends VisualizationActivity {
     }
 
     private void setupAnalyzer() {
-        analyzer = new Analyzer(new Analyzer.OnGainListener() {
+        analyzer = new AnalyzerThread(new AnalyzerThread.OnGainListener() {
             @Override
             public void onGain(Analyzer.Gain[] gains) {
                 GainListPacket packet = new GainListPacket(gains);
                 sender.send(GainListPacketBuilder.encode(packet));
             }
         });
+        analyzer.start();
     }
 
     private void setupWatcher() {
@@ -72,6 +72,7 @@ public class BossActivity extends VisualizationActivity {
     protected void onDestroy() {
         super.onDestroy();
         watcher.deinit();
+        analyzer.cancel();
         sender.cancel();
     }
 }
