@@ -40,7 +40,7 @@ public class SenderThread extends Thread {
             DatagramPacket packet = new DatagramPacket(data, data.length, address, NetParams.PORT);
             socket.send(packet);
         } catch (IOException e) {
-            Logger.debug("Exception occurred during packet send");
+            Logger.warning("Exception occurred during packet send", e);
         }
     }
 

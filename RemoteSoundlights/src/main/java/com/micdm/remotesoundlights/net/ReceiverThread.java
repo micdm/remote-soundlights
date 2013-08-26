@@ -35,7 +35,7 @@ public class ReceiverThread extends Thread {
             socket.receive(packet);
             listener.onData(packet.getData());
         } catch (IOException e) {
-            Logger.debug("Exception occurred during packet receive");
+            Logger.warning("Exception occurred during packet receive", e);
         }
     }
 
