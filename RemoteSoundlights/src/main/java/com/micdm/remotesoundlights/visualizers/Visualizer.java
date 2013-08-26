@@ -1,6 +1,6 @@
 package com.micdm.remotesoundlights.visualizers;
 
-import com.micdm.remotesoundlights.activities.boss.Analyzer;
+import com.micdm.remotesoundlights.modes.boss.Analyzer;
 
 import org.andengine.engine.handler.IUpdateHandler;
 

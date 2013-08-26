@@ -2,7 +2,7 @@ package com.micdm.remotesoundlights.visualizers;
 
 import android.content.res.AssetManager;
 
-import com.micdm.remotesoundlights.activities.boss.Analyzer;
+import com.micdm.remotesoundlights.modes.boss.Analyzer;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
@@ -26,7 +26,7 @@ public class PointVisualizer implements Visualizer {
     private class UpdateHandler implements IUpdateHandler {
 
         private final float ALPHA_PER_SECOND = 2;
-        private final float PIXEL_PER_SECOND = 200;
+        private final float PIXEL_PER_SECOND = 500;
         private final float DEGREES_PER_SECOND = 180;
 
         @Override

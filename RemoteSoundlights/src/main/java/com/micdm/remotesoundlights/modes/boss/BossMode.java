@@ -1,26 +1,29 @@
-package com.micdm.remotesoundlights.activities.boss;
+package com.micdm.remotesoundlights.modes.boss;
 
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 
-import com.micdm.remotesoundlights.activities.VisualizationActivity;
 import com.micdm.remotesoundlights.data.GainListPacket;
 import com.micdm.remotesoundlights.data.GainListPacketBuilder;
+import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.net.SenderThread;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
-public class BossActivity extends VisualizationActivity {
+public class BossMode extends BaseMode {
 
     private SenderThread sender;
     private AnalyzerThread analyzer;
     private VisualizerWatcher watcher;
 
+    public BossMode(Context context, OnReceiveListener listener) {
+        super(context, listener);
+    }
+
     private InetAddress getBroadcastAddress() {
-        WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         DhcpInfo dhcp = manager.getDhcpInfo();
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
         byte[] quads = new byte[4];
@@ -61,15 +64,15 @@ public class BossActivity extends VisualizationActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreate() {
+        super.onCreate();
         setupSender();
         setupAnalyzer();
         setupWatcher();
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         watcher.deinit();
         analyzer.cancel();

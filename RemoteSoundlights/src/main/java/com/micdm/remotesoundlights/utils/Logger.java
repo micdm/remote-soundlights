@@ -6,8 +6,8 @@ public class Logger {
 
     private static final String TAG = "com.micdm.remotesoundlights";
 
-    public static void debug(String message) {
-        Log.d(TAG, message);
+    public static void debug(String message, Object... args) {
+        Log.d(TAG, String.format(message, args));
     }
 
     public static void warning(String message, Throwable e) {

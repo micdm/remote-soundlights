@@ -1,6 +1,6 @@
 package com.micdm.remotesoundlights.data;
 
-import com.micdm.remotesoundlights.activities.boss.Analyzer;
+import com.micdm.remotesoundlights.modes.boss.Analyzer;
 
 public class GainListPacket {
 

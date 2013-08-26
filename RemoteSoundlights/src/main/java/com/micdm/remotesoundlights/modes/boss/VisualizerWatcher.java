@@ -1,4 +1,4 @@
-package com.micdm.remotesoundlights.activities.boss;
+package com.micdm.remotesoundlights.modes.boss;
 
 import android.media.audiofx.Visualizer;
 
