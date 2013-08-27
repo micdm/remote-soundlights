@@ -27,7 +27,7 @@ public class SenderThread extends Thread {
             socket.setBroadcast(true);
             return socket;
         } catch (IOException e) {
-            return null;
+            throw new RuntimeException("Can not create socket");
         }
     }
 

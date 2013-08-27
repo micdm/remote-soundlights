@@ -6,8 +6,8 @@ import android.view.Display;
 import com.micdm.remotesoundlights.data.GainListPacket;
 import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
-import com.micdm.remotesoundlights.scenes.SelectModeScene;
-import com.micdm.remotesoundlights.utils.Logger;
+import com.micdm.remotesoundlights.scenes.SelectModeSceneBuilder;
+import com.micdm.remotesoundlights.scenes.VisualizationSceneBuilder;
 import com.micdm.remotesoundlights.visualizers.PointVisualizer;
 import com.micdm.remotesoundlights.visualizers.Visualizer;
 
@@ -16,7 +16,6 @@ import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.util.AverageFPSCounter;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
 public class VisualizationActivity extends SimpleBaseGameActivity {
@@ -40,16 +39,6 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onCreateResources() {}
 
-    private void addUpdateHandlers() {
-        getEngine().registerUpdateHandler(visualizer.getSpriteHandler());
-        getEngine().registerUpdateHandler(new AverageFPSCounter() {
-            @Override
-            protected void onHandleAverageDurationElapsed(float fps) {
-                Logger.debug("FPS is %s now", fps);
-            }
-        });
-    }
-
     private BaseMode.OnReceiveListener getReceiveListener() {
         return new BaseMode.OnReceiveListener() {
             @Override
@@ -64,26 +53,35 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         };
     }
 
-    private void setupMode(SelectModeScene.ModeType type) {
-        if (type == SelectModeScene.ModeType.GUEST) {
+    private void setupMode(SelectModeSceneBuilder.ModeType type) {
+        if (type == SelectModeSceneBuilder.ModeType.GUEST) {
             mode = new BaseMode(this, getReceiveListener());
         }
-        if (type == SelectModeScene.ModeType.BOSS) {
+        if (type == SelectModeSceneBuilder.ModeType.BOSS) {
             mode = new BossMode(this, getReceiveListener());
         }
         mode.onCreate();
     }
 
-    @Override
-    protected Scene onCreateScene() {
-        Scene scene = new SelectModeScene(new SelectModeScene.OnSelectModeListener() {
+    private Scene buildSelectModeScene() {
+        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(getEngine(), getAssets(), new SelectModeSceneBuilder.OnSelectModeListener() {
             @Override
-            public void onSelectMode(SelectModeScene.ModeType type) {
+            public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
+                getEngine().setScene(buildVisualizationScene());
                 setupMode(type);
             }
         });
-        addUpdateHandlers();
-        return scene;
+        return builder.build();
+    }
+
+    private Scene buildVisualizationScene() {
+        VisualizationSceneBuilder builder = new VisualizationSceneBuilder(visualizer);
+        return builder.build();
+    }
+
+    @Override
+    protected Scene onCreateScene() {
+        return buildSelectModeScene();
     }
 
     @Override

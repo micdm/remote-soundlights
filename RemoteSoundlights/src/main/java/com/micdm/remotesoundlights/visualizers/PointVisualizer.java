@@ -65,7 +65,7 @@ public class PointVisualizer implements Visualizer {
         this.assets = assets;
     }
 
-    private TextureRegion getSpriteRegion() {
+    private TextureRegion getTextureRegion() {
         try {
             TextureManager manager = engine.getTextureManager();
             AssetInputStreamOpener opener = new AssetInputStreamOpener(assets, "gfx/star.png");
@@ -120,7 +120,7 @@ public class PointVisualizer implements Visualizer {
         if (camera == null) {
             return;
         }
-        TextureRegion region = getSpriteRegion();
+        TextureRegion region = getTextureRegion();
         if (region == null) {
             return;
         }

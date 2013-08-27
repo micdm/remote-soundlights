@@ -24,7 +24,7 @@ public class ReceiverThread extends Thread {
         try {
             return new DatagramSocket(NetParams.PORT);
         } catch (IOException e) {
-            return null;
+            throw new RuntimeException("Can not create socket", e);
         }
     }
 
