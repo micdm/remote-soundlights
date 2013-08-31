@@ -1,25 +1,17 @@
 package com.micdm.remotesoundlights.visualizers;
 
-import android.content.res.AssetManager;
-
 import com.micdm.remotesoundlights.modes.boss.Analyzer;
+import com.micdm.remotesoundlights.utils.ResourceRegistry;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.TextureManager;
-import org.andengine.opengl.texture.TextureOptions;
-import org.andengine.opengl.texture.bitmap.BitmapTexture;
-import org.andengine.opengl.texture.bitmap.BitmapTextureFormat;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
-import org.andengine.util.adt.io.in.AssetInputStreamOpener;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
-
-import java.io.IOException;
 
 public class PointVisualizer implements Visualizer {
 
@@ -58,22 +50,9 @@ public class PointVisualizer implements Visualizer {
     }
 
     private Engine engine;
-    private AssetManager assets;
 
-    public PointVisualizer(Engine engine, AssetManager assets) {
+    public PointVisualizer(Engine engine) {
         this.engine = engine;
-        this.assets = assets;
-    }
-
-    private TextureRegion getTextureRegion() {
-        try {
-            TextureManager manager = engine.getTextureManager();
-            AssetInputStreamOpener opener = new AssetInputStreamOpener(assets, "gfx/star.png");
-            BitmapTexture texture = (BitmapTexture) manager.getTexture("point", opener, BitmapTextureFormat.RGBA_4444, TextureOptions.DEFAULT);
-            return TextureRegionFactory.extractFromTexture(texture);
-        } catch (IOException e) {
-            throw new RuntimeException("Can not load texture");
-        }
     }
 
     private float getSize(Analyzer.LEVEL level) {
@@ -120,7 +99,7 @@ public class PointVisualizer implements Visualizer {
         if (camera == null) {
             return;
         }
-        TextureRegion region = getTextureRegion();
+        TextureRegion region = TextureRegionFactory.extractFromTexture(ResourceRegistry.getTexture());
         if (region == null) {
             return;
         }
