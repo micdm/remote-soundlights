@@ -69,7 +69,7 @@ public class PointVisualizer implements Visualizer {
         try {
             TextureManager manager = engine.getTextureManager();
             AssetInputStreamOpener opener = new AssetInputStreamOpener(assets, "gfx/star.png");
-            BitmapTexture texture = (BitmapTexture) manager.getTexture("point", opener, BitmapTextureFormat.RGBA_4444, TextureOptions.BILINEAR);
+            BitmapTexture texture = (BitmapTexture) manager.getTexture("point", opener, BitmapTextureFormat.RGBA_4444, TextureOptions.DEFAULT);
             return TextureRegionFactory.extractFromTexture(texture);
         } catch (IOException e) {
             throw new RuntimeException("Can not load texture");
