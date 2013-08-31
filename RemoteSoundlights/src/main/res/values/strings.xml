@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Remote Soundlights</string>
+    <string name="app_name">Party Soundlights</string>
     <string name="select_mode_boss">PARTY\nBOSS</string>
     <string name="select_mode_guest">PARTY\nGUEST</string>
     <string name="wifi_disabled_message">WiFi is disabled now. Please turn it on!</string>
