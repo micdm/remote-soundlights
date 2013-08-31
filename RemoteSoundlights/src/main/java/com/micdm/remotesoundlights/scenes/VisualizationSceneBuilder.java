@@ -3,12 +3,13 @@ package com.micdm.remotesoundlights.scenes;
 import com.micdm.remotesoundlights.utils.Logger;
 import com.micdm.remotesoundlights.visualizers.Visualizer;
 
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.util.AverageFPSCounter;
 import org.andengine.util.color.Color;
 
 public class VisualizationSceneBuilder {
+
+    public static class Scene extends org.andengine.entity.scene.Scene {}
 
     private Visualizer visualizer;
 

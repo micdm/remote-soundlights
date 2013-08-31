@@ -5,7 +5,6 @@ import android.content.Context;
 import com.micdm.remotesoundlights.R;
 
 import org.andengine.engine.Engine;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.ButtonSprite;
 import org.andengine.entity.sprite.Sprite;
@@ -31,6 +30,8 @@ public class SelectModeSceneBuilder {
     public static interface OnSelectModeListener {
         public void onSelectMode(ModeType type);
     }
+
+    public static class Scene extends org.andengine.entity.scene.Scene {}
 
     public static enum ModeType {
         GUEST,
@@ -89,7 +90,7 @@ public class SelectModeSceneBuilder {
         label.setHorizontalAlign(HorizontalAlign.CENTER);
         label.setLeading(-20);
         label.setX(200 - label.getWidth() / 2);
-        label.setY(210 - label.getHeight() / 2 + 10);
+        label.setY(205 - label.getHeight() / 2 + 10);
         label.setColor(Color.BLACK);
         sprite.attachChild(label);
     }

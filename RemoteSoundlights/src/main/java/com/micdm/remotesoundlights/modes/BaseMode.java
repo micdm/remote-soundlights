@@ -32,9 +32,7 @@ public class BaseMode {
         receiver.start();
     }
 
-    public void onCreate() {
-        setupReceiver();
-    }
+    public void onCreate() {}
 
     public void onStart() {
         setupReceiver();

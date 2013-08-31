@@ -28,7 +28,43 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        visualizer = new PointVisualizer(mEngine, getAssets());
+        visualizer = new PointVisualizer(getEngine(), getAssets());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mode != null) {
+            mode.onStart();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mode != null) {
+            mode.onStop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mode != null) {
+            mode.onDestroy();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getEngine().getScene() instanceof VisualizationSceneBuilder.Scene) {
+            mode.onStop();
+            mode.onDestroy();
+            mode = null;
+            getEngine().setScene(buildSelectModeScene());
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -73,6 +109,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             mode = new BossMode(this, getReceiveListener());
         }
         mode.onCreate();
+        mode.onStart();
     }
 
     private Scene buildSelectModeScene() {
@@ -103,29 +140,5 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected Scene onCreateScene() {
         return buildSelectModeScene();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mode != null) {
-            mode.onStart();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mode != null) {
-            mode.onStop();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mode != null) {
-            mode.onDestroy();
-        }
     }
 }
