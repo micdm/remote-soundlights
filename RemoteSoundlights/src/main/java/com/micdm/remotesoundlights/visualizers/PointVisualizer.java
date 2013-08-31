@@ -58,10 +58,10 @@ public class PointVisualizer implements Visualizer {
     private float getSize(Analyzer.LEVEL level) {
         Camera camera = engine.getCamera();
         if (level == Analyzer.LEVEL.HIGH_HIGH) {
-            return camera.getWidth() * 0.1f;
+            return camera.getWidth() * 0.05f;
         }
         if (level == Analyzer.LEVEL.LOW_HIGH) {
-            return camera.getWidth() * 0.125f;
+            return camera.getWidth() * 0.075f;
         }
         if (level == Analyzer.LEVEL.HIGH_MIDDLE) {
             return camera.getHeight() * 0.25f;
