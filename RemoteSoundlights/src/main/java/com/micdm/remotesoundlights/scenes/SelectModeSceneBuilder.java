@@ -1,6 +1,8 @@
 package com.micdm.remotesoundlights.scenes;
 
-import android.content.res.AssetManager;
+import android.content.Context;
+
+import com.micdm.remotesoundlights.R;
 
 import org.andengine.engine.Engine;
 import org.andengine.entity.scene.Scene;
@@ -35,20 +37,20 @@ public class SelectModeSceneBuilder {
         BOSS
     }
 
+    private Context context;
     private Engine engine;
-    private AssetManager assets;
     private OnSelectModeListener listener;
 
-    public SelectModeSceneBuilder(Engine engine, AssetManager assets, OnSelectModeListener listener) {
+    public SelectModeSceneBuilder(Context context, Engine engine, OnSelectModeListener listener) {
+        this.context = context;
         this.engine = engine;
-        this.assets = assets;
         this.listener = listener;
     }
 
     private TextureRegion getTextureRegion() {
         try {
             TextureManager manager = engine.getTextureManager();
-            AssetInputStreamOpener opener = new AssetInputStreamOpener(assets, "gfx/star.png");
+            AssetInputStreamOpener opener = new AssetInputStreamOpener(context.getAssets(), "gfx/star.png");
             BitmapTexture texture = (BitmapTexture) manager.getTexture("point", opener, BitmapTextureFormat.RGBA_4444, TextureOptions.BILINEAR);
             return TextureRegionFactory.extractFromTexture(texture);
         } catch (IOException e) {
@@ -58,7 +60,7 @@ public class SelectModeSceneBuilder {
 
     private Font getFont() {
         BitmapTextureAtlas atlas = new BitmapTextureAtlas(engine.getTextureManager(), 512, 64);
-        Font font = FontFactory.createFromAsset(engine.getFontManager(), atlas, assets, "fonts/BebasNeue.otf", 60, true, 0xFFFFFFFF);
+        Font font = FontFactory.createFromAsset(engine.getFontManager(), atlas, context.getAssets(), "fonts/BebasNeue.otf", 60, true, 0xFFFFFFFF);
         engine.getTextureManager().loadTexture(atlas);
         engine.getFontManager().loadFont(font);
         return font;
@@ -87,7 +89,7 @@ public class SelectModeSceneBuilder {
         label.setHorizontalAlign(HorizontalAlign.CENTER);
         label.setLeading(-20);
         label.setX(200 - label.getWidth() / 2);
-        label.setY(200 - label.getHeight() / 2);
+        label.setY(210 - label.getHeight() / 2 + 10);
         label.setColor(Color.BLACK);
         sprite.attachChild(label);
     }
@@ -96,14 +98,14 @@ public class SelectModeSceneBuilder {
         float x = engine.getCamera().getCenterX() - 400;
         float y = engine.getCamera().getCenterY() - 200;
         Color color = ColorUtils.convertARGBPackedIntToColor(0xFFFF5959);
-        addButton(scene, x, y, color, "PARTY\nBOSS", ModeType.BOSS);
+        addButton(scene, x, y, color, context.getString(R.string.select_mode_boss), ModeType.BOSS);
     }
 
     private void addGuestButton(Scene scene) {
         float x = engine.getCamera().getCenterX();
         float y = engine.getCamera().getCenterY() - 200;
         Color color = ColorUtils.convertARGBPackedIntToColor(0xFF59ABFF);
-        addButton(scene, x, y, color, "PARTY\nGUEST", ModeType.GUEST);
+        addButton(scene, x, y, color, context.getString(R.string.select_mode_guest), ModeType.GUEST);
     }
 
     public Scene build() {

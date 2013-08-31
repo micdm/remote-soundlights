@@ -1,7 +1,9 @@
 package com.micdm.remotesoundlights;
 
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Display;
+import android.widget.Toast;
 
 import com.micdm.remotesoundlights.data.GainListPacket;
 import com.micdm.remotesoundlights.modes.BaseMode;
@@ -53,6 +55,16 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         };
     }
 
+    private boolean checkIfWifiEnabled() {
+        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+        return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
+    }
+
+    private void showWiFiDisabledMessage() {
+        Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
+        message.show();
+    }
+
     private void setupMode(SelectModeSceneBuilder.ModeType type) {
         if (type == SelectModeSceneBuilder.ModeType.GUEST) {
             mode = new BaseMode(this, getReceiveListener());
@@ -64,11 +76,20 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     }
 
     private Scene buildSelectModeScene() {
-        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(getEngine(), getAssets(), new SelectModeSceneBuilder.OnSelectModeListener() {
+        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(this, getEngine(), new SelectModeSceneBuilder.OnSelectModeListener() {
             @Override
             public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
-                getEngine().setScene(buildVisualizationScene());
-                setupMode(type);
+                if (checkIfWifiEnabled()) {
+                    getEngine().setScene(buildVisualizationScene());
+                    setupMode(type);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showWiFiDisabledMessage();
+                        }
+                    });
+                }
             }
         });
         return builder.build();
