@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="boss_button">#FFFF5959</color>
+    <color name="guest_button">#FF59ABFF</color>
+    <color name="bass">#FF952D2D</color>
+    <color name="middle">#FF37952D</color>
+    <color name="high">#FF2D7395</color>
+</resources>

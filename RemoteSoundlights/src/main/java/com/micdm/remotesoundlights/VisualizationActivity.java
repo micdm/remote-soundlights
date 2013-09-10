@@ -29,7 +29,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        visualizer = new PointVisualizer(getEngine());
+        visualizer = new PointVisualizer(this, getEngine());
     }
 
     @Override

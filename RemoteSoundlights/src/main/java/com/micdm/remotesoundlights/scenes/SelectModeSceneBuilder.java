@@ -30,6 +30,8 @@ public class SelectModeSceneBuilder {
         BOSS
     }
 
+    private static final int BUTTON_SIZE = 400;
+
     private Context context;
     private Engine engine;
     private OnSelectModeListener listener;
@@ -48,8 +50,8 @@ public class SelectModeSceneBuilder {
                 listener.onSelectMode(type);
             }
         });
-        sprite.setWidth(400);
-        sprite.setHeight(400);
+        sprite.setWidth(BUTTON_SIZE);
+        sprite.setHeight(BUTTON_SIZE);
         sprite.setColor(color);
         addButtonLabel(sprite, text);
         scene.registerTouchArea(sprite);
@@ -62,23 +64,23 @@ public class SelectModeSceneBuilder {
         Text label = new Text(0, 0, font, text, engine.getVertexBufferObjectManager());
         label.setHorizontalAlign(HorizontalAlign.CENTER);
         label.setLeading(-20);
-        label.setX(200 - label.getWidth() / 2);
-        label.setY(205 - label.getHeight() / 2 + 10);
+        label.setX(BUTTON_SIZE / 2 - label.getWidth() / 2);
+        label.setY(BUTTON_SIZE / 2 - label.getHeight() / 2 + 7);
         label.setColor(Color.BLACK);
         sprite.attachChild(label);
     }
 
     private void addBossButton(Scene scene) {
-        float x = engine.getCamera().getCenterX() - 400;
-        float y = engine.getCamera().getCenterY() - 200;
-        Color color = ColorUtils.convertARGBPackedIntToColor(0xFFFF5959);
+        float x = engine.getCamera().getCenterX() - BUTTON_SIZE;
+        float y = engine.getCamera().getCenterY() - BUTTON_SIZE / 2;
+        Color color = ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.boss_button));
         addButton(scene, x, y, color, context.getString(R.string.select_mode_boss), ModeType.BOSS);
     }
 
     private void addGuestButton(Scene scene) {
         float x = engine.getCamera().getCenterX();
-        float y = engine.getCamera().getCenterY() - 200;
-        Color color = ColorUtils.convertARGBPackedIntToColor(0xFF59ABFF);
+        float y = engine.getCamera().getCenterY() - BUTTON_SIZE / 2;
+        Color color = ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.guest_button));
         addButton(scene, x, y, color, context.getString(R.string.select_mode_guest), ModeType.GUEST);
     }
 

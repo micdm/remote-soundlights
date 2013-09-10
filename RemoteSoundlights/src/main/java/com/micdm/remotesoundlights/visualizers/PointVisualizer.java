@@ -1,5 +1,8 @@
 package com.micdm.remotesoundlights.visualizers;
 
+import android.content.Context;
+
+import com.micdm.remotesoundlights.R;
 import com.micdm.remotesoundlights.modes.boss.Analyzer;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
 
@@ -49,9 +52,11 @@ public class PointVisualizer implements Visualizer {
         public void reset() {}
     }
 
+    private Context context;
     private Engine engine;
 
-    public PointVisualizer(Engine engine) {
+    public PointVisualizer(Context context, Engine engine) {
+        this.context = context;
         this.engine = engine;
     }
 
@@ -78,20 +83,20 @@ public class PointVisualizer implements Visualizer {
         if (level == Analyzer.LEVEL.LOW_BASS) {
             return camera.getWidth() * 1.5f;
         }
-        throw new RuntimeException("Unknow level " + level);
+        throw new RuntimeException(String.format("Unknow level %s", level));
     }
 
     private Color getColor(Analyzer.LEVEL level) {
         if (level == Analyzer.LEVEL.LOW_HIGH || level == Analyzer.LEVEL.HIGH_HIGH) {
-            return ColorUtils.convertARGBPackedIntToColor(0xFF2D7395);
+            return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.high));
         }
         if (level == Analyzer.LEVEL.LOW_MIDDLE || level == Analyzer.LEVEL.MEDIUM_MIDDLE || level == Analyzer.LEVEL.HIGH_MIDDLE) {
-            return ColorUtils.convertARGBPackedIntToColor(0xFF37952D);
+            return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.middle));
         }
         if (level == Analyzer.LEVEL.LOW_BASS || level == Analyzer.LEVEL.HIGH_BASS) {
-            return ColorUtils.convertARGBPackedIntToColor(0xFF952D2D);
+            return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.bass));
         }
-        throw new RuntimeException("Unknown level " + level);
+        throw new RuntimeException(String.format("Unknown level %s", level));
     }
 
     private void addSprite(float size, Color color) {
