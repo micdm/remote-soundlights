@@ -2,6 +2,7 @@ package com.micdm.remotesoundlights.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.DisplayMetrics;
 
 import org.andengine.engine.Engine;
 import org.andengine.opengl.font.Font;
@@ -27,9 +28,21 @@ public class ResourceRegistry {
         ResourceRegistry.font = font;
     }
 
+    private static String getTextureName(Context context) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        if (metrics.densityDpi >= DisplayMetrics.DENSITY_XHIGH) {
+            return "xhigh";
+        }
+        if (metrics.densityDpi >= DisplayMetrics.DENSITY_HIGH) {
+            return "high";
+        }
+        return "medium";
+    }
+
     private static void loadTexture(Context context, Engine engine) {
         try {
-            AssetInputStreamOpener opener = new AssetInputStreamOpener(context.getAssets(), "gfx/star.png");
+            String path = String.format("gfx/%s.png", getTextureName(context));
+            AssetInputStreamOpener opener = new AssetInputStreamOpener(context.getAssets(), path);
             ResourceRegistry.texture = (BitmapTexture) engine.getTextureManager().getTexture("point", opener, BitmapTextureFormat.RGBA_4444, TextureOptions.BILINEAR);
         } catch (IOException e) {
             throw new RuntimeException("Can not load texture");
