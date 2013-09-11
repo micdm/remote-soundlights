@@ -4,23 +4,23 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class AnalyzerThread extends Thread {
 
-    public static interface OnGainListener {
-        public void onGain(Analyzer.Gain[] gains);
+    public static interface OnPeakListener {
+        public void onPeak(Analyzer.Peak[] peaks);
     }
 
     private static final int QUEUE_SIZE = 100;
 
     private boolean isActive = true;
     private ArrayBlockingQueue<byte[]> queue = new ArrayBlockingQueue<byte[]>(QUEUE_SIZE);
-    private Analyzer analyzer = new Analyzer(new Analyzer.OnGainListener() {
+    private Analyzer analyzer = new Analyzer(new Analyzer.OnPeakListener() {
         @Override
-        public void onGain(Analyzer.Gain[] gains) {
-            listener.onGain(gains);
+        public void onPeak(Analyzer.Peak[] peaks) {
+            listener.onPeak(peaks);
         }
     });
-    private OnGainListener listener;
+    private OnPeakListener listener;
 
-    public AnalyzerThread(OnGainListener listener) {
+    public AnalyzerThread(OnPeakListener listener) {
         this.listener = listener;
     }
 

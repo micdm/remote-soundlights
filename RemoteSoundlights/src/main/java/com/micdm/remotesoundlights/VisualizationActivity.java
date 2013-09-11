@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.micdm.remotesoundlights.data.GainListPacket;
+import com.micdm.remotesoundlights.data.PeakListPacket;
 import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
 import com.micdm.remotesoundlights.scenes.SelectModeSceneBuilder;
@@ -83,11 +83,11 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     private BaseMode.OnReceiveListener getReceiveListener() {
         return new BaseMode.OnReceiveListener() {
             @Override
-            public void onReceive(final GainListPacket packet) {
+            public void onReceive(final PeakListPacket packet) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        visualizer.visualize(packet.getGains());
+                        visualizer.visualize(packet.getPeaks());
                     }
                 });
             }

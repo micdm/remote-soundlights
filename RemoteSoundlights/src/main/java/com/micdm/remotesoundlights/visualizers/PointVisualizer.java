@@ -121,9 +121,9 @@ public class PointVisualizer implements Visualizer {
     }
 
     @Override
-    public void visualize(Analyzer.Gain[] gains) {
-        for (Analyzer.Gain gain: gains) {
-            Analyzer.LEVEL level = gain.getLevel();
+    public void visualize(Analyzer.Peak[] peaks) {
+        for (Analyzer.Peak peak : peaks) {
+            Analyzer.LEVEL level = peak.getLevel();
             float size = getSize(level);
             Color color = getColor(level);
             addSprite(size, color);

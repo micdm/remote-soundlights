@@ -6,5 +6,5 @@ import org.andengine.engine.handler.IUpdateHandler;
 
 public interface Visualizer {
     public IUpdateHandler getSpriteHandler();
-    public void visualize(Analyzer.Gain[] gains);
+    public void visualize(Analyzer.Peak[] peaks);
 }

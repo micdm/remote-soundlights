@@ -4,8 +4,8 @@ import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 
-import com.micdm.remotesoundlights.data.GainListPacket;
-import com.micdm.remotesoundlights.data.GainListPacketBuilder;
+import com.micdm.remotesoundlights.data.PeakListPacket;
+import com.micdm.remotesoundlights.data.PeakListPacketBuilder;
 import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.net.SenderThread;
 
@@ -43,11 +43,11 @@ public class BossMode extends BaseMode {
     }
 
     private void setupAnalyzer() {
-        analyzer = new AnalyzerThread(new AnalyzerThread.OnGainListener() {
+        analyzer = new AnalyzerThread(new AnalyzerThread.OnPeakListener() {
             @Override
-            public void onGain(Analyzer.Gain[] gains) {
-                GainListPacket packet = new GainListPacket(gains);
-                sender.send(GainListPacketBuilder.encode(packet));
+            public void onPeak(Analyzer.Peak[] peaks) {
+                PeakListPacket packet = new PeakListPacket(peaks);
+                sender.send(PeakListPacketBuilder.encode(packet));
             }
         });
         analyzer.start();

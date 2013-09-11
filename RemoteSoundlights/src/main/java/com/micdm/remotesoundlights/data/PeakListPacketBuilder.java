@@ -5,7 +5,7 @@ import com.micdm.remotesoundlights.modes.boss.Analyzer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class GainListPacketBuilder {
+public class PeakListPacketBuilder {
 
     private static final int MAX_PACKET_SIZE = 256;
 
@@ -18,27 +18,27 @@ public class GainListPacketBuilder {
         return null;
     }
 
-    public static byte[] encode(GainListPacket packet) {
+    public static byte[] encode(PeakListPacket packet) {
         ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE);
-        Analyzer.Gain[] gains = packet.getGains();
-        buffer.putInt(gains.length);
-        for (Analyzer.Gain gain: gains) {
-            buffer.putInt(gain.getLevel().getNumber());
-            buffer.putFloat(gain.getValue());
+        Analyzer.Peak[] peaks = packet.getPeaks();
+        buffer.putInt(peaks.length);
+        for (Analyzer.Peak peak : peaks) {
+            buffer.putInt(peak.getLevel().getNumber());
+            buffer.putFloat(peak.getValue());
         }
         return buffer.array();
     }
 
-    public static GainListPacket decode(byte[] data) {
+    public static PeakListPacket decode(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         int count = buffer.getInt();
-        ArrayList<Analyzer.Gain> gains = new ArrayList<Analyzer.Gain>(count);
+        ArrayList<Analyzer.Peak> peaks = new ArrayList<Analyzer.Peak>(count);
         for (int i = 0; i < count; i += 1) {
             Analyzer.LEVEL level = getLevel(buffer.getInt());
             float value = buffer.getFloat();
-            gains.add(new Analyzer.Gain(level, value));
+            peaks.add(new Analyzer.Peak(level, value));
         }
-        Analyzer.Gain[] content = new Analyzer.Gain[count];
-        return new GainListPacket(gains.toArray(content));
+        Analyzer.Peak[] content = new Analyzer.Peak[count];
+        return new PeakListPacket(peaks.toArray(content));
     }
 }

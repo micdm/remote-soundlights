@@ -5,16 +5,16 @@ import java.util.LinkedList;
 
 public class Analyzer {
 
-    public static interface OnGainListener {
-        public void onGain(Gain[] gains);
+    public static interface OnPeakListener {
+        public void onPeak(Peak[] peaks);
     }
 
-    public static class Gain {
+    public static class Peak {
 
         private LEVEL level;
         private float value;
 
-        public Gain(LEVEL level, float value) {
+        public Peak(LEVEL level, float value) {
             this.level = level;
             this.value = value;
         }
@@ -79,9 +79,9 @@ public class Analyzer {
     private static final int[] FREQUENCIES = {10, 80, 200, 500, 2500, 500, 10000, 20000};
 
     private BeatDetector[] detectors = new BeatDetector[LEVEL.values().length];
-    private OnGainListener listener;
+    private OnPeakListener listener;
 
-    public Analyzer(OnGainListener listener) {
+    public Analyzer(OnPeakListener listener) {
         initDetectors();
         this.listener = listener;
     }
@@ -128,24 +128,24 @@ public class Analyzer {
         return energies;
     }
 
-    private Gain[] getGains(double[] energies) {
-        ArrayList<Gain> gains = new ArrayList<Gain>();
+    private Peak[] getPeaks(double[] energies) {
+        ArrayList<Peak> peaks = new ArrayList<Peak>();
         LEVEL[] levels = LEVEL.values();
         for (int i = 0; i < levels.length; i += 1) {
             if (detectors[i].addEnergy(energies[i])) {
-                gains.add(new Gain(levels[i], (int) energies[i]));
+                peaks.add(new Peak(levels[i], (int) energies[i]));
             }
         }
-        Gain[] content = new Gain[gains.size()];
-        return gains.toArray(content);
+        Peak[] content = new Peak[peaks.size()];
+        return peaks.toArray(content);
     }
 
     public void setFftData(byte[] data) {
         double[] levels = getFrequencyLevels(data);
         double[] energies = getEnergies(levels);
-        Gain[] gains = getGains(energies);
-        if (gains.length != 0) {
-            listener.onGain(gains);
+        Peak[] peaks = getPeaks(energies);
+        if (peaks.length != 0) {
+            listener.onPeak(peaks);
         }
     }
 }

@@ -2,14 +2,14 @@ package com.micdm.remotesoundlights.modes;
 
 import android.content.Context;
 
-import com.micdm.remotesoundlights.data.GainListPacket;
-import com.micdm.remotesoundlights.data.GainListPacketBuilder;
+import com.micdm.remotesoundlights.data.PeakListPacket;
+import com.micdm.remotesoundlights.data.PeakListPacketBuilder;
 import com.micdm.remotesoundlights.net.ReceiverThread;
 
 public class BaseMode {
 
     public static interface OnReceiveListener {
-        public void onReceive(GainListPacket packet);
+        public void onReceive(PeakListPacket packet);
     }
 
     protected Context context;
@@ -25,7 +25,7 @@ public class BaseMode {
         receiver = new ReceiverThread(new ReceiverThread.OnDataListener() {
             @Override
             public void onData(byte[] data) {
-                GainListPacket packet = GainListPacketBuilder.decode(data);
+                PeakListPacket packet = PeakListPacketBuilder.decode(data);
                 listener.onReceive(packet);
             }
         });
