@@ -17,7 +17,7 @@ import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
 
-public class SelectModeSceneBuilder {
+public class SelectModeSceneBuilder extends SceneBuilder {
 
     public static interface OnSelectModeListener {
         public void onSelectMode(ModeType type);
@@ -32,24 +32,13 @@ public class SelectModeSceneBuilder {
 
     private static final int BUTTON_SIZE = 400;
 
-    private Context context;
-    private Engine engine;
-    private OnSelectModeListener listener;
-
-    public SelectModeSceneBuilder(Context context, Engine engine, OnSelectModeListener listener) {
-        this.context = context;
-        this.engine = engine;
-        this.listener = listener;
+    public SelectModeSceneBuilder(Context context, Engine engine) {
+        super(context, engine);
     }
 
-    private void addButton(Scene scene, float x, float y, Color color, String text, final ModeType type) {
+    private ButtonSprite addButton(Scene scene, float x, float y, Color color, String text) {
         TextureRegion region = TextureRegionFactory.extractFromTexture(ResourceRegistry.getTexture());
-        Sprite sprite = new ButtonSprite(x, y, region, engine.getVertexBufferObjectManager(), new ButtonSprite.OnClickListener() {
-            @Override
-            public void onClick(ButtonSprite sprite, float x, float y) {
-                listener.onSelectMode(type);
-            }
-        });
+        ButtonSprite sprite = new ButtonSprite(x, y, region, engine.getVertexBufferObjectManager());
         sprite.setWidth(BUTTON_SIZE);
         sprite.setHeight(BUTTON_SIZE);
         sprite.setColor(color);
@@ -57,6 +46,7 @@ public class SelectModeSceneBuilder {
         scene.registerTouchArea(sprite);
         scene.setTouchAreaBindingOnActionDownEnabled(true);
         scene.attachChild(sprite);
+        return sprite;
     }
 
     private void addButtonLabel(Sprite sprite, String text) {
@@ -70,25 +60,37 @@ public class SelectModeSceneBuilder {
         sprite.attachChild(label);
     }
 
-    private void addBossButton(Scene scene) {
+    private void addBossButton(Scene scene, final OnSelectModeListener listener) {
         float x = engine.getCamera().getCenterX() - BUTTON_SIZE;
         float y = engine.getCamera().getCenterY() - BUTTON_SIZE / 2;
         Color color = ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.boss_button));
-        addButton(scene, x, y, color, context.getString(R.string.select_mode_boss), ModeType.BOSS);
+        ButtonSprite sprite = addButton(scene, x, y, color, context.getString(R.string.select_mode_boss));
+        sprite.setOnClickListener(new ButtonSprite.OnClickListener() {
+            @Override
+            public void onClick(ButtonSprite sprite, float x, float y) {
+                listener.onSelectMode(ModeType.BOSS);
+            }
+        });
     }
 
-    private void addGuestButton(Scene scene) {
+    private void addGuestButton(Scene scene, final OnSelectModeListener listener) {
         float x = engine.getCamera().getCenterX();
         float y = engine.getCamera().getCenterY() - BUTTON_SIZE / 2;
         Color color = ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.guest_button));
-        addButton(scene, x, y, color, context.getString(R.string.select_mode_guest), ModeType.GUEST);
+        ButtonSprite sprite = addButton(scene, x, y, color, context.getString(R.string.select_mode_guest));
+        sprite.setOnClickListener(new ButtonSprite.OnClickListener() {
+            @Override
+            public void onClick(ButtonSprite sprite, float x, float y) {
+                listener.onSelectMode(ModeType.GUEST);
+            }
+        });
     }
 
-    public Scene build() {
+    public Scene build(OnSelectModeListener listener) {
         Scene scene = new Scene();
         scene.setBackground(new Background(Color.BLACK));
-        addBossButton(scene);
-        addGuestButton(scene);
+        addBossButton(scene, listener);
+        addGuestButton(scene, listener);
         return scene;
     }
 }

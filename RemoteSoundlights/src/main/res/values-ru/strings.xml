@@ -4,9 +4,9 @@
     <string name="select_mode_boss">Хозяин</string>
     <string name="select_mode_guest">Гость</string>
     <string name="wifi_disabled_message">WiFi отключен. Пожалуйста, включите!</string>
-    <string name="wait_for_music">Давайте послушаем музыку!</string>
+    <string name="wait_for_music">Включайте музыку</string>
     <string name="wait_for_boss">Ждём хозяина вечеринки…</string>
-    <string name="rate_message">Вам по вкусу это приложение? Хотите оценить его?</string>
+    <string name="rate_message">Вам по вкусу это приложение? Хотите оценить его? Автору будет приятно.</string>
     <string name="rate_message_yes">Хочу…</string>
     <string name="rate_message_no">Не хочу</string>
     <string name="rate_message_later">Позже</string>

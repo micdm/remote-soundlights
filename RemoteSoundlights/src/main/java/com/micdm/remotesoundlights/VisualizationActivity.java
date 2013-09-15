@@ -36,7 +36,6 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        visualizer = new PointVisualizer(this, getEngine());
         showRateMessage();
     }
 
@@ -70,6 +69,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             mode.onStop();
             mode.onDestroy();
             mode = null;
+            visualizer = null;
             getEngine().setScene(buildSelectModeScene());
         } else {
             super.onBackPressed();
@@ -88,6 +88,20 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         ResourceRegistry.load(this, getEngine());
     }
 
+    private boolean checkIfWifiEnabled() {
+        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+        return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
+    }
+
+    private void showWiFiDisabledMessage() {
+        Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
+        message.show();
+    }
+
+    private void setupVisualizer() {
+        visualizer = new PointVisualizer(this, getEngine());
+    }
+
     private BaseMode.OnReceiveListener getReceiveListener() {
         return new BaseMode.OnReceiveListener() {
             @Override
@@ -102,16 +116,6 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         };
     }
 
-    private boolean checkIfWifiEnabled() {
-        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
-        return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
-    }
-
-    private void showWiFiDisabledMessage() {
-        Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
-        message.show();
-    }
-
     private void setupMode(SelectModeSceneBuilder.ModeType type) {
         if (type == SelectModeSceneBuilder.ModeType.GUEST) {
             mode = new BaseMode(this, getReceiveListener());
@@ -124,11 +128,13 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     }
 
     private Scene buildSelectModeScene() {
-        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(this, getEngine(), new SelectModeSceneBuilder.OnSelectModeListener() {
+        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(this, getEngine());
+        return builder.build(new SelectModeSceneBuilder.OnSelectModeListener() {
             @Override
             public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
                 if (checkIfWifiEnabled()) {
-                    getEngine().setScene(buildVisualizationScene());
+                    setupVisualizer();
+                    getEngine().setScene(buildVisualizationScene(type));
                     setupMode(type);
                 } else {
                     runOnUiThread(new Runnable() {
@@ -140,12 +146,11 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
                 }
             }
         });
-        return builder.build();
     }
 
-    private Scene buildVisualizationScene() {
-        VisualizationSceneBuilder builder = new VisualizationSceneBuilder(visualizer);
-        return builder.build();
+    private Scene buildVisualizationScene(SelectModeSceneBuilder.ModeType type) {
+        VisualizationSceneBuilder builder = new VisualizationSceneBuilder(this, getEngine());
+        return builder.build(visualizer, type);
     }
 
     @Override

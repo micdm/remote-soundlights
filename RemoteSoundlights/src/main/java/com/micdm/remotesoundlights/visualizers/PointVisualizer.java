@@ -10,6 +10,7 @@ import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.shape.RectangularShape;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
@@ -26,25 +27,28 @@ public class PointVisualizer implements Visualizer {
 
         @Override
         public void onUpdate(float elapsed) {
+            if (!isStarted) {
+                return;
+            }
             Scene scene = engine.getScene();
             float fade = elapsed * ALPHA_PER_SECOND;
             float growth = elapsed * PIXEL_PER_SECOND;
             float angle = elapsed * DEGREES_PER_SECOND;
             for (int i = scene.getChildCount() - 1; i >= 0; i -= 1) {
-                Sprite sprite = (Sprite) scene.getChildByIndex(i);
-                float alpha = sprite.getAlpha();
+                RectangularShape shape = (RectangularShape) scene.getChildByIndex(i);
+                float alpha = shape.getAlpha();
                 if (alpha < fade) {
-                    scene.detachChild(sprite);
+                    scene.detachChild(shape);
                     continue;
                 }
-                sprite.setAlpha(alpha - fade);
-                sprite.setX(sprite.getX() - growth / 2);
-                sprite.setWidth(sprite.getWidth() + growth);
-                sprite.setY(sprite.getY() - growth / 2);
-                sprite.setHeight(sprite.getHeight() + growth);
-                sprite.setRotationCenter(sprite.getWidth() / 2, sprite.getHeight() / 2);
-                float rotation = sprite.getRotation();
-                sprite.setRotation((rotation > 0) ? rotation + angle : rotation - angle);
+                shape.setAlpha(alpha - fade);
+                shape.setX(shape.getX() - growth / 2);
+                shape.setWidth(shape.getWidth() + growth);
+                shape.setY(shape.getY() - growth / 2);
+                shape.setHeight(shape.getHeight() + growth);
+                shape.setRotationCenter(shape.getWidth() / 2, shape.getHeight() / 2);
+                float rotation = shape.getRotation();
+                shape.setRotation((rotation > 0) ? rotation + angle : rotation - angle);
             }
         }
 
@@ -54,6 +58,7 @@ public class PointVisualizer implements Visualizer {
 
     private Context context;
     private Engine engine;
+    private boolean isStarted;
 
     public PointVisualizer(Context context, Engine engine) {
         this.context = context;
@@ -122,7 +127,8 @@ public class PointVisualizer implements Visualizer {
 
     @Override
     public void visualize(Analyzer.Peak[] peaks) {
-        for (Analyzer.Peak peak : peaks) {
+        isStarted = true;
+        for (Analyzer.Peak peak: peaks) {
             Analyzer.LEVEL level = peak.getLevel();
             float size = getSize(level);
             Color color = getColor(level);
