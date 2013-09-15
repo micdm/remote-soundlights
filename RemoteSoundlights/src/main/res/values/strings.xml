@@ -4,4 +4,10 @@
     <string name="select_mode_boss">PARTY\nBOSS</string>
     <string name="select_mode_guest">PARTY\nGUEST</string>
     <string name="wifi_disabled_message">WiFi is disabled now. Please turn it on!</string>
+    <string name="wait_for_music">Let\'s play some music!</string>
+    <string name="wait_for_boss">Waiting for a boss…</string>
+    <string name="rate_message">Do you like this app? Would you rate it on the store?</string>
+    <string name="rate_message_yes">Yes…</string>
+    <string name="rate_message_no">No</string>
+    <string name="rate_message_later">Later</string>
 </resources>

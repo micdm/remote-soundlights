@@ -10,6 +10,7 @@ import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
 import com.micdm.remotesoundlights.scenes.SelectModeSceneBuilder;
 import com.micdm.remotesoundlights.scenes.VisualizationSceneBuilder;
+import com.micdm.remotesoundlights.utils.RateMessage;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
 import com.micdm.remotesoundlights.visualizers.PointVisualizer;
 import com.micdm.remotesoundlights.visualizers.Visualizer;
@@ -26,10 +27,17 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     private Visualizer visualizer;
     private BaseMode mode;
 
+    private void showRateMessage() {
+        RateMessage message = new RateMessage(this);
+        message.update();
+        message.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         visualizer = new PointVisualizer(this, getEngine());
+        showRateMessage();
     }
 
     @Override
