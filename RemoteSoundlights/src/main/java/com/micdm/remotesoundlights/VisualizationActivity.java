@@ -10,6 +10,7 @@ import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
 import com.micdm.remotesoundlights.scenes.SelectModeSceneBuilder;
 import com.micdm.remotesoundlights.scenes.VisualizationSceneBuilder;
+import com.micdm.remotesoundlights.utils.AnalyticsTracker;
 import com.micdm.remotesoundlights.utils.RateMessage;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
 import com.micdm.remotesoundlights.visualizers.PointVisualizer;
@@ -42,6 +43,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        AnalyticsTracker.sendActivityStart(this);
         if (mode != null) {
             mode.onStart();
         }
@@ -50,6 +52,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        AnalyticsTracker.sendActivityStop(this);
         if (mode != null) {
             mode.onStop();
         }
@@ -119,9 +122,11 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     private void setupMode(SelectModeSceneBuilder.ModeType type) {
         if (type == SelectModeSceneBuilder.ModeType.GUEST) {
             mode = new BaseMode(this, getReceiveListener());
+            AnalyticsTracker.sendEvent(this, "mode", "select", "guest");
         }
         if (type == SelectModeSceneBuilder.ModeType.BOSS) {
             mode = new BossMode(this, getReceiveListener());
+            AnalyticsTracker.sendEvent(this, "mode", "select", "boss");
         }
         mode.onCreate();
         mode.onStart();
