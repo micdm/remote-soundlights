@@ -21,8 +21,8 @@ public class ResourceRegistry {
     private static BitmapTexture texture;
 
     private static void loadFont(Context context, Engine engine) {
-        BitmapTextureAtlas atlas = new BitmapTextureAtlas(engine.getTextureManager(), 512, 512);
-        Font font = FontFactory.createFromAsset(engine.getFontManager(), atlas, context.getAssets(), "fonts/OpenSans-CondBold.ttf", 48, true, Color.WHITE);
+        BitmapTextureAtlas atlas = new BitmapTextureAtlas(engine.getTextureManager(), 256, 128);
+        Font font = FontFactory.createFromAsset(engine.getFontManager(), atlas, context.getAssets(), "fonts/PT_Sans-Narrow-Web-Bold.ttf", 48, true, Color.WHITE);
         engine.getTextureManager().loadTexture(atlas);
         engine.getFontManager().loadFont(font);
         ResourceRegistry.font = font;

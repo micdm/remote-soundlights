@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Цветомузыка для вечеринки</string>
-    <string name="select_mode_boss">Хозяин</string>
+    <string name="select_mode_boss">Хозяин\nвечера</string>
     <string name="select_mode_guest">Гость</string>
     <string name="wifi_disabled_message">WiFi отключен. Пожалуйста, включите!</string>
     <string name="wait_for_music">Включайте музыку</string>
