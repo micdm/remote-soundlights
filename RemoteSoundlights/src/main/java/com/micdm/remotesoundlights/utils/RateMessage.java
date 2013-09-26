@@ -59,6 +59,7 @@ public class RateMessage {
                     context.startActivity(intent);
                     setHiddenByUser();
                 } catch (ActivityNotFoundException e) {}
+                AnalyticsTracker.sendEvent(context, "rate", "select", "yes");
             }
         });
         builder.setNeutralButton(R.string.rate_message_later, null);
@@ -66,6 +67,7 @@ public class RateMessage {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 setHiddenByUser();
+                AnalyticsTracker.sendEvent(context, "rate", "select", "no");
             }
         });
         return builder.create();
