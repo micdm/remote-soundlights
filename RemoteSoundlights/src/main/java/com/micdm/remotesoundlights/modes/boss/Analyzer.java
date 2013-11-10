@@ -46,6 +46,18 @@ public class Analyzer {
         public int getNumber() {
             return number;
         }
+
+        public boolean isBass() {
+            return this == LOW_BASS || this == HIGH_BASS;
+        }
+
+        public boolean isMiddle() {
+            return this == LOW_MIDDLE || this == MEDIUM_MIDDLE || this == HIGH_MIDDLE;
+        }
+
+        public boolean isHigh() {
+            return this == LOW_HIGH || this == HIGH_HIGH;
+        }
     }
 
     private static class BeatDetector {

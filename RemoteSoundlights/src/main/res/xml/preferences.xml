@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/settings_flashlight">
+        <CheckBoxPreference
+            android:title="@string/settings_flashlight_use"
+            android:key="settings_use_flashlight"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:title="@string/settings_flashlight_bass"
+            android:dependency="settings_use_flashlight"
+            android:key="settings_use_flashlight_bass"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:title="@string/settings_flashlight_middle"
+            android:dependency="settings_use_flashlight"
+            android:key="settings_use_flashlight_middle"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:title="@string/settings_flashlight_high"
+            android:dependency="settings_use_flashlight"
+            android:key="settings_use_flashlight_high"
+            android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -113,8 +113,8 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
 
     private void setupVisualizers() {
         visualizers.add(new PointVisualizer(this, getEngine()));
-        if (FlashlightVisualizer.isAvailable(this)) {
-            visualizers.add(new FlashlightVisualizer());
+        if (FlashlightVisualizer.canBeEnabled(this)) {
+            visualizers.add(new FlashlightVisualizer(this));
         }
     }
 

@@ -92,13 +92,13 @@ public class PointVisualizer implements SpriteVisualizer {
     }
 
     private Color getColor(Analyzer.LEVEL level) {
-        if (level == Analyzer.LEVEL.LOW_HIGH || level == Analyzer.LEVEL.HIGH_HIGH) {
+        if (level.isHigh()) {
             return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.high));
         }
-        if (level == Analyzer.LEVEL.LOW_MIDDLE || level == Analyzer.LEVEL.MEDIUM_MIDDLE || level == Analyzer.LEVEL.HIGH_MIDDLE) {
+        if (level.isMiddle()) {
             return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.middle));
         }
-        if (level == Analyzer.LEVEL.LOW_BASS || level == Analyzer.LEVEL.HIGH_BASS) {
+        if (level.isBass()) {
             return ColorUtils.convertARGBPackedIntToColor(context.getResources().getColor(R.color.bass));
         }
         throw new RuntimeException(String.format("Unknown level %s", level));
