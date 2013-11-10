@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Цветомузыка для вечеринки</string>
+    <!-- Экран загрузки -->
+    <string name="loading">Загрузка…</string>
     <!-- Экран цветомузыки -->
     <string name="select_mode_boss">Хозяин\nвечера</string>
     <string name="select_mode_guest">Гость</string>

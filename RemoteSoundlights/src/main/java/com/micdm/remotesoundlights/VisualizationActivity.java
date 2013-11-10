@@ -1,5 +1,6 @@
 package com.micdm.remotesoundlights;
 
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Display;
@@ -8,8 +9,9 @@ import android.widget.Toast;
 import com.micdm.remotesoundlights.data.PeakListPacket;
 import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
-import com.micdm.remotesoundlights.scenes.SelectModeSceneBuilder;
-import com.micdm.remotesoundlights.scenes.VisualizationSceneBuilder;
+import com.micdm.remotesoundlights.scene_builders.LoadingSceneBuilder;
+import com.micdm.remotesoundlights.scene_builders.SelectModeSceneBuilder;
+import com.micdm.remotesoundlights.scene_builders.VisualizationSceneBuilder;
 import com.micdm.remotesoundlights.utils.AnalyticsTracker;
 import com.micdm.remotesoundlights.utils.RateMessage;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
@@ -19,6 +21,8 @@ import com.micdm.remotesoundlights.visualizers.SpriteVisualizer;
 import com.micdm.remotesoundlights.visualizers.Visualizer;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
@@ -83,7 +87,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             mode.onDestroy();
             mode = null;
             visualizers.clear();
-            getEngine().setScene(buildSelectModeScene());
+            getEngine().setScene(buildLoadingScene());
         } else {
             super.onBackPressed();
         }
@@ -97,59 +101,28 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     }
 
     @Override
-    protected void onCreateResources() {
-        ResourceRegistry.load(this, getEngine());
+    protected void onCreateResources() {}
+
+    @Override
+    protected Scene onCreateScene() {
+        return buildLoadingScene();
     }
 
-    private boolean checkIfWifiEnabled() {
-        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
-        return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
-    }
-
-    private void showWiFiDisabledMessage() {
-        Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
-        message.show();
-    }
-
-    private void setupVisualizers() {
-        visualizers.add(new PointVisualizer(this, getEngine()));
-        if (FlashlightVisualizer.canBeEnabled(this)) {
-            visualizers.add(new FlashlightVisualizer(this));
-        }
-    }
-
-    private BaseMode.OnReceiveListener getReceiveListener() {
-        return new BaseMode.OnReceiveListener() {
+    private Scene buildLoadingScene() {
+        ResourceRegistry.loadMinimal(this, getEngine());
+        Scene scene = LoadingSceneBuilder.build(this, getEngine());
+        scene.registerUpdateHandler(new TimerHandler(0.001f, new ITimerCallback() {
             @Override
-            public void onReceive(final PeakListPacket packet) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Visualizer visualizer: visualizers) {
-                            visualizer.visualize(packet.getPeaks());
-                        }
-                    }
-                });
+            public void onTimePassed(TimerHandler timer) {
+                getEngine().setScene(buildSelectModeScene());
             }
-        };
-    }
-
-    private void setupMode(SelectModeSceneBuilder.ModeType type) {
-        if (type == SelectModeSceneBuilder.ModeType.GUEST) {
-            mode = new BaseMode(this, getReceiveListener());
-            AnalyticsTracker.sendEvent(this, "mode", "select", "guest");
-        }
-        if (type == SelectModeSceneBuilder.ModeType.BOSS) {
-            mode = new BossMode(this, getReceiveListener());
-            AnalyticsTracker.sendEvent(this, "mode", "select", "boss");
-        }
-        mode.onCreate();
-        mode.onStart();
+        }));
+        return scene;
     }
 
     private Scene buildSelectModeScene() {
-        SelectModeSceneBuilder builder = new SelectModeSceneBuilder(this, getEngine());
-        return builder.build(new SelectModeSceneBuilder.OnSelectModeListener() {
+        ResourceRegistry.load(this, getEngine());
+        return SelectModeSceneBuilder.build(this, getEngine(), new SelectModeSceneBuilder.OnSelectModeListener() {
             @Override
             public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
                 if (checkIfWifiEnabled()) {
@@ -171,6 +144,71 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         });
     }
 
+
+    private boolean checkIfWifiEnabled() {
+        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+        return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
+    }
+
+    private void showWiFiDisabledMessage() {
+        Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
+        message.show();
+    }
+
+    private void setupVisualizers() {
+        visualizers.add(new PointVisualizer(this, getEngine()));
+        if (FlashlightVisualizer.canBeEnabled(this)) {
+            visualizers.add(new FlashlightVisualizer(this));
+        }
+    }
+
+    private void setupMode(SelectModeSceneBuilder.ModeType type) {
+        if (type == SelectModeSceneBuilder.ModeType.GUEST) {
+            mode = new BaseMode(this, getReceiveListener());
+            AnalyticsTracker.sendEvent(this, "mode", "select", "guest");
+        }
+        if (type == SelectModeSceneBuilder.ModeType.BOSS) {
+            mode = new BossMode(this, getReceiveListener());
+            AnalyticsTracker.sendEvent(this, "mode", "select", "boss");
+        }
+        mode.onCreate();
+        mode.onStart();
+    }
+
+    private BaseMode.OnReceiveListener getReceiveListener() {
+        return new BaseMode.OnReceiveListener() {
+
+            private boolean isFirstPacket = true;
+
+            @Override
+            public void onReceive(final PeakListPacket packet) {
+                if (isFirstPacket) {
+                    VisualizationSceneBuilder.prepare((VisualizationSceneBuilder.Scene) getEngine().getScene());
+                    isFirstPacket = false;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Visualizer visualizer: visualizers) {
+                            visualizer.visualize(packet.getPeaks());
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    private Scene buildVisualizationScene(SelectModeSceneBuilder.ModeType type) {
+        Scene scene = VisualizationSceneBuilder.build(this, getEngine(), type, new VisualizationSceneBuilder.OnSettingsListener() {
+            @Override
+            public void onSettings() {
+                goToSettings();
+            }
+        });
+        scene.registerUpdateHandler(getSpriteVisualizer().getSpriteHandler());
+        return scene;
+    }
+
     private SpriteVisualizer getSpriteVisualizer() {
         for (Visualizer visualizer: visualizers) {
             if (visualizer instanceof SpriteVisualizer) {
@@ -180,13 +218,8 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         throw new RuntimeException("No sprite visualizer found");
     }
 
-    private Scene buildVisualizationScene(SelectModeSceneBuilder.ModeType type) {
-        VisualizationSceneBuilder builder = new VisualizationSceneBuilder(this, getEngine());
-        return builder.build(getSpriteVisualizer(), type);
-    }
-
-    @Override
-    protected Scene onCreateScene() {
-        return buildSelectModeScene();
+    private void goToSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 }

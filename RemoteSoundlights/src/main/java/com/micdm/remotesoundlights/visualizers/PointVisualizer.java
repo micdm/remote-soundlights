@@ -12,30 +12,38 @@ import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.shape.RectangularShape;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
+import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
 
 public class PointVisualizer implements SpriteVisualizer {
 
-    private class UpdateHandler implements IUpdateHandler {
+    private static class UpdateHandler implements IUpdateHandler {
 
         private final float ALPHA_PER_SECOND = 2;
         private final float PIXEL_PER_SECOND = 500;
         private final float DEGREES_PER_SECOND = 180;
 
+        private Engine engine;
+
+        public UpdateHandler(Engine engine) {
+            this.engine = engine;
+        }
+
         @Override
         public void onUpdate(float elapsed) {
-            if (!isStarted) {
-                return;
-            }
             Scene scene = engine.getScene();
             float fade = elapsed * ALPHA_PER_SECOND;
             float growth = elapsed * PIXEL_PER_SECOND;
             float angle = elapsed * DEGREES_PER_SECOND;
             for (int i = scene.getChildCount() - 1; i >= 0; i -= 1) {
                 RectangularShape shape = (RectangularShape) scene.getChildByIndex(i);
+                if (!(shape instanceof PointSprite)) {
+                    continue;
+                }
                 float alpha = shape.getAlpha();
                 if (alpha < fade) {
                     scene.detachChild(shape);
@@ -56,9 +64,15 @@ public class PointVisualizer implements SpriteVisualizer {
         public void reset() {}
     }
 
+    private static class PointSprite extends Sprite {
+
+        public PointSprite(float x, float y, float width, float height, ITextureRegion region, VertexBufferObjectManager manager) {
+            super(x, y, width, height, region, manager);
+        }
+    }
+
     private Context context;
     private Engine engine;
-    private boolean isStarted;
 
     public PointVisualizer(Context context, Engine engine) {
         this.context = context;
@@ -109,7 +123,7 @@ public class PointVisualizer implements SpriteVisualizer {
         if (camera == null) {
             return;
         }
-        TextureRegion region = TextureRegionFactory.extractFromTexture(ResourceRegistry.getTexture());
+        TextureRegion region = TextureRegionFactory.extractFromTexture(ResourceRegistry.getStarTexture());
         if (region == null) {
             return;
         }
@@ -119,7 +133,7 @@ public class PointVisualizer implements SpriteVisualizer {
         }
         float x = (float) (Math.random() * (camera.getWidth() - size));
         float y = (float) (Math.random() * (camera.getHeight() - size));
-        Sprite sprite = new Sprite(x, y, size, size, region, engine.getVertexBufferObjectManager());
+        Sprite sprite = new PointSprite(x, y, size, size, region, engine.getVertexBufferObjectManager());
         sprite.setColor(color);
         sprite.setRotation((float) (-180 + Math.random() * 360));
         scene.attachChild(sprite);
@@ -127,7 +141,7 @@ public class PointVisualizer implements SpriteVisualizer {
 
     @Override
     public IUpdateHandler getSpriteHandler() {
-        return new UpdateHandler();
+        return new UpdateHandler(engine);
     }
 
     @Override
@@ -138,7 +152,6 @@ public class PointVisualizer implements SpriteVisualizer {
 
     @Override
     public void visualize(Analyzer.Peak[] peaks) {
-        isStarted = true;
         for (Analyzer.Peak peak: peaks) {
             Analyzer.LEVEL level = peak.getLevel();
             float size = getSize(level);
