@@ -1,6 +1,7 @@
 package com.micdm.remotesoundlights.utils;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
@@ -9,8 +10,8 @@ import java.util.Map;
 
 public abstract class AnalyticsTracker {
 
-    private static EasyTracker getTracker(Activity activity) {
-        return EasyTracker.getInstance(activity);
+    private static EasyTracker getTracker(Context context) {
+        return EasyTracker.getInstance(context);
     }
 
     public static void sendActivityStart(Activity activity) {
@@ -21,8 +22,8 @@ public abstract class AnalyticsTracker {
         getTracker(activity).activityStop(activity);
     }
 
-    public static void sendEvent(Activity activity, String category, String action, String label) {
+    public static void sendEvent(Context context, String category, String action, String label) {
         Map<String, String> params = MapBuilder.createEvent(category, action, label, null).build();
-        getTracker(activity).send(params);
+        getTracker(context).send(params);
     }
 }
