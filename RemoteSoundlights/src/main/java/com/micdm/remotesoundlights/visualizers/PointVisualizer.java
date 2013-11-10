@@ -17,7 +17,7 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
 
-public class PointVisualizer implements Visualizer {
+public class PointVisualizer implements SpriteVisualizer {
 
     private class UpdateHandler implements IUpdateHandler {
 
@@ -126,6 +126,17 @@ public class PointVisualizer implements Visualizer {
     }
 
     @Override
+    public IUpdateHandler getSpriteHandler() {
+        return new UpdateHandler();
+    }
+
+    @Override
+    public void start() {}
+
+    @Override
+    public void stop() {}
+
+    @Override
     public void visualize(Analyzer.Peak[] peaks) {
         isStarted = true;
         for (Analyzer.Peak peak: peaks) {
@@ -134,10 +145,5 @@ public class PointVisualizer implements Visualizer {
             Color color = getColor(level);
             addSprite(size, color);
         }
-    }
-
-    @Override
-    public IUpdateHandler getSpriteHandler() {
-        return new UpdateHandler();
     }
 }
