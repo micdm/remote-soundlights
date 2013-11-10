@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.micdm.remotesoundlights.R;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
-import com.micdm.remotesoundlights.visualizers.Visualizer;
+import com.micdm.remotesoundlights.visualizers.SpriteVisualizer;
 
 import org.andengine.engine.Engine;
 import org.andengine.entity.scene.background.Background;
@@ -43,11 +43,11 @@ public class VisualizationSceneBuilder extends SceneBuilder {
         scene.attachChild(label);
     }
 
-    private void addUpdateHandlers(Scene scene, Visualizer visualizer) {
+    private void addUpdateHandlers(Scene scene, SpriteVisualizer visualizer) {
         scene.registerUpdateHandler(visualizer.getSpriteHandler());
     }
 
-    public Scene build(Visualizer visualizer, SelectModeSceneBuilder.ModeType type) {
+    public Scene build(SpriteVisualizer visualizer, SelectModeSceneBuilder.ModeType type) {
         Scene scene = new Scene();
         scene.setBackground(new Background(Color.BLACK));
         addWaitingMessage(scene, type);

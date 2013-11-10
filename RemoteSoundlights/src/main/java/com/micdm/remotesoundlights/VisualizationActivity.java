@@ -13,7 +13,9 @@ import com.micdm.remotesoundlights.scenes.VisualizationSceneBuilder;
 import com.micdm.remotesoundlights.utils.AnalyticsTracker;
 import com.micdm.remotesoundlights.utils.RateMessage;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
+import com.micdm.remotesoundlights.visualizers.FlashlightVisualizer;
 import com.micdm.remotesoundlights.visualizers.PointVisualizer;
+import com.micdm.remotesoundlights.visualizers.SpriteVisualizer;
 import com.micdm.remotesoundlights.visualizers.Visualizer;
 
 import org.andengine.engine.camera.Camera;
@@ -23,9 +25,11 @@ import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 
+import java.util.ArrayList;
+
 public class VisualizationActivity extends SimpleBaseGameActivity {
 
-    private Visualizer visualizer;
+    private ArrayList<Visualizer> visualizers = new ArrayList<Visualizer>();
     private BaseMode mode;
 
     private void showRateMessage() {
@@ -47,12 +51,18 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         if (mode != null) {
             mode.onStart();
         }
+        for (Visualizer visualizer: visualizers) {
+            visualizer.start();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         AnalyticsTracker.sendActivityStop(this);
+        for (Visualizer visualizer: visualizers) {
+            visualizer.stop();
+        }
         if (mode != null) {
             mode.onStop();
         }
@@ -72,7 +82,7 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             mode.onStop();
             mode.onDestroy();
             mode = null;
-            visualizer = null;
+            visualizers.clear();
             getEngine().setScene(buildSelectModeScene());
         } else {
             super.onBackPressed();
@@ -101,8 +111,11 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         message.show();
     }
 
-    private void setupVisualizer() {
-        visualizer = new PointVisualizer(this, getEngine());
+    private void setupVisualizers() {
+        visualizers.add(new PointVisualizer(this, getEngine()));
+        if (FlashlightVisualizer.isAvailable(this)) {
+            visualizers.add(new FlashlightVisualizer());
+        }
     }
 
     private BaseMode.OnReceiveListener getReceiveListener() {
@@ -112,7 +125,9 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        visualizer.visualize(packet.getPeaks());
+                        for (Visualizer visualizer: visualizers) {
+                            visualizer.visualize(packet.getPeaks());
+                        }
                     }
                 });
             }
@@ -138,9 +153,12 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             @Override
             public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
                 if (checkIfWifiEnabled()) {
-                    setupVisualizer();
+                    setupVisualizers();
                     getEngine().setScene(buildVisualizationScene(type));
                     setupMode(type);
+                    for (Visualizer visualizer: visualizers) {
+                        visualizer.start();
+                    }
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -153,9 +171,18 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         });
     }
 
+    private SpriteVisualizer getSpriteVisualizer() {
+        for (Visualizer visualizer: visualizers) {
+            if (visualizer instanceof SpriteVisualizer) {
+                return (SpriteVisualizer) visualizer;
+            }
+        }
+        throw new RuntimeException("No sprite visualizer found");
+    }
+
     private Scene buildVisualizationScene(SelectModeSceneBuilder.ModeType type) {
         VisualizationSceneBuilder builder = new VisualizationSceneBuilder(this, getEngine());
-        return builder.build(visualizer, type);
+        return builder.build(getSpriteVisualizer(), type);
     }
 
     @Override
