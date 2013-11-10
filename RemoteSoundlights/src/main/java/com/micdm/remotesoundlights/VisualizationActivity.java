@@ -9,11 +9,12 @@ import android.widget.Toast;
 import com.micdm.remotesoundlights.data.PeakListPacket;
 import com.micdm.remotesoundlights.modes.BaseMode;
 import com.micdm.remotesoundlights.modes.boss.BossMode;
+import com.micdm.remotesoundlights.notifiers.NewsNotifier;
+import com.micdm.remotesoundlights.notifiers.RateNotifier;
 import com.micdm.remotesoundlights.scene_builders.LoadingSceneBuilder;
 import com.micdm.remotesoundlights.scene_builders.SelectModeSceneBuilder;
 import com.micdm.remotesoundlights.scene_builders.VisualizationSceneBuilder;
 import com.micdm.remotesoundlights.utils.AnalyticsTracker;
-import com.micdm.remotesoundlights.utils.RateMessage;
 import com.micdm.remotesoundlights.utils.ResourceRegistry;
 import com.micdm.remotesoundlights.visualizers.FlashlightVisualizer;
 import com.micdm.remotesoundlights.visualizers.PointVisualizer;
@@ -36,16 +37,17 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     private ArrayList<Visualizer> visualizers = new ArrayList<Visualizer>();
     private BaseMode mode;
 
-    private void showRateMessage() {
-        RateMessage message = new RateMessage(this);
-        message.update();
-        message.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        showRateMessage();
+        showMessages();
+    }
+
+    private void showMessages() {
+        RateNotifier.update(this);
+        if (!NewsNotifier.show(this)) {
+            RateNotifier.show(this);
+        }
     }
 
     @Override

@@ -9,6 +9,9 @@
     <string name="wifi_disabled_message">WiFi is disabled now. Please turn it on!</string>
     <string name="wait_for_music">Let\'s play some music</string>
     <string name="wait_for_boss">Waiting for a boss…</string>
+    <!-- Новости -->
+    <string name="news_title">New on %s</string>
+    <string name="news_1.1"></string>
     <!-- Диалог для оценивания -->
     <string name="rate_message">Do you like this app? Would you rate it on the store? Author will be pleased.</string>
     <string name="rate_message_yes">Yes…</string>

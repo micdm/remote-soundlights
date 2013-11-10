@@ -9,6 +9,9 @@
     <string name="wifi_disabled_message">WiFi отключен. Пожалуйста, включите!</string>
     <string name="wait_for_music">Включайте музыку</string>
     <string name="wait_for_boss">Ждём хозяина вечеринки…</string>
+    <!-- Новости -->
+    <string name="news_title">Новое в версии %s</string>
+    <string name="news_1.1">Теперь можно использовать вспышку! В этом вам поможет шестерёнка.</string>
     <!-- Диалог для оценивания -->
     <string name="rate_message">Вам по вкусу это приложение? Хотите оценить его? Автору будет приятно.</string>
     <string name="rate_message_yes">Хочу…</string>
