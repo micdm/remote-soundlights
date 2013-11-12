@@ -64,16 +64,16 @@ public class BossMode extends BaseMode {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public void init() {
+        super.init();
         setupSender();
         setupAnalyzer();
         setupWatcher();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void deinit() {
+        super.deinit();
         watcher.deinit();
         analyzer.cancel();
         sender.cancel();

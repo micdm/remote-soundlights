@@ -32,15 +32,15 @@ public class BaseMode {
         receiver.start();
     }
 
-    public void onCreate() {}
+    public void init() {}
 
-    public void onStart() {
+    public void start() {
         setupReceiver();
     }
 
-    public void onStop() {
+    public void stop() {
         receiver.cancel();
     }
 
-    public void onDestroy() {}
+    public void deinit() {}
 }

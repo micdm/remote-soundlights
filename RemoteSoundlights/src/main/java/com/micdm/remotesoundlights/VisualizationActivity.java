@@ -55,7 +55,16 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         super.onStart();
         AnalyticsTracker.sendActivityStart(this);
         if (mode != null) {
-            mode.onStart();
+            mode.start();
+        }
+        addVisualizers();
+    }
+
+    private void addVisualizers() {
+        assert visualizers.size() == 0;
+        visualizers.add(new PointVisualizer(this, getEngine()));
+        if (FlashlightVisualizer.canBeEnabled(this)) {
+            visualizers.add(new FlashlightVisualizer(this));
         }
         for (Visualizer visualizer: visualizers) {
             visualizer.start();
@@ -65,30 +74,34 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        removeVisualizers();
+        if (mode != null) {
+            mode.stop();
+        }
         AnalyticsTracker.sendActivityStop(this);
+    }
+
+    private void removeVisualizers() {
         for (Visualizer visualizer: visualizers) {
             visualizer.stop();
         }
-        if (mode != null) {
-            mode.onStop();
-        }
+        visualizers.clear();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mode != null) {
-            mode.onDestroy();
+            mode.deinit();
         }
     }
 
     @Override
     public void onBackPressed() {
         if (getEngine().getScene() instanceof VisualizationSceneBuilder.Scene) {
-            mode.onStop();
-            mode.onDestroy();
+            mode.stop();
+            mode.deinit();
             mode = null;
-            visualizers.clear();
             getEngine().setScene(buildLoadingScene());
         } else {
             super.onBackPressed();
@@ -128,12 +141,8 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             @Override
             public void onSelectMode(SelectModeSceneBuilder.ModeType type) {
                 if (checkIfWifiEnabled()) {
-                    setupVisualizers();
                     getEngine().setScene(buildVisualizationScene(type));
                     setupMode(type);
-                    for (Visualizer visualizer: visualizers) {
-                        visualizer.start();
-                    }
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -146,7 +155,6 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
         });
     }
 
-
     private boolean checkIfWifiEnabled() {
         WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
         return manager.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
@@ -155,13 +163,6 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
     private void showWiFiDisabledMessage() {
         Toast message = Toast.makeText(this, R.string.wifi_disabled_message, Toast.LENGTH_LONG);
         message.show();
-    }
-
-    private void setupVisualizers() {
-        visualizers.add(new PointVisualizer(this, getEngine()));
-        if (FlashlightVisualizer.canBeEnabled(this)) {
-            visualizers.add(new FlashlightVisualizer(this));
-        }
     }
 
     private void setupMode(SelectModeSceneBuilder.ModeType type) {
@@ -173,8 +174,8 @@ public class VisualizationActivity extends SimpleBaseGameActivity {
             mode = new BossMode(this, getReceiveListener());
             AnalyticsTracker.sendEvent(this, "mode", "select", "boss");
         }
-        mode.onCreate();
-        mode.onStart();
+        mode.init();
+        mode.start();
     }
 
     private BaseMode.OnReceiveListener getReceiveListener() {
