@@ -2,7 +2,7 @@ package com.micdm.remotesoundlights.modes.boss;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class AnalyzerThread extends Thread {
+class AnalyzerThread extends Thread {
 
     public static interface OnPeakListener {
         public void onPeak(Analyzer.Peak[] peaks);

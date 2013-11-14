@@ -2,11 +2,13 @@ package com.micdm.remotesoundlights.modes.boss;
 
 import android.media.audiofx.Visualizer;
 
-public class VisualizerWatcher {
+class VisualizerWatcher {
 
     public static interface OnDataListener {
         public void onData(byte[] data);
     }
+
+    private static final int RATE = 20000;
 
     private OnDataListener listener;
     private Visualizer visualizer;
@@ -24,9 +26,9 @@ public class VisualizerWatcher {
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] data, int rate) {}
             @Override
             public void onFftDataCapture(Visualizer visualizer, byte[] data, int rate) {
-                listener.onData(data);
+                listener.onData(data.clone());
             }
-        }, 20000, false, true);
+        }, RATE, false, true);
         visualizer.setEnabled(true);
     }
 

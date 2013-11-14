@@ -3,7 +3,7 @@ package com.micdm.remotesoundlights.notifiers;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public abstract class Notifier {
+abstract class Notifier {
 
     private static final String PREF_NAME = "notifiers";
 

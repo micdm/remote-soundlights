@@ -12,31 +12,14 @@ public class ReceiverThread extends Thread {
         public void onData(byte[] data);
     }
 
+    private static final int BUFFER_SIZE = 256;
+
     private boolean isActive = true;
     private DatagramSocket socket;
     private OnDataListener listener;
 
     public ReceiverThread(OnDataListener listener) {
         this.listener = listener;
-    }
-
-    private DatagramSocket getSocket() {
-        try {
-            return new DatagramSocket(NetParams.PORT);
-        } catch (IOException e) {
-            throw new RuntimeException("Can not create socket", e);
-        }
-    }
-
-    private void receive() {
-        try {
-            byte[] buffer = new byte[512];
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            socket.receive(packet);
-            listener.onData(packet.getData());
-        } catch (IOException e) {
-            Logger.warning("Exception occurred during packet receive", e);
-        }
     }
 
     @Override
@@ -49,6 +32,25 @@ public class ReceiverThread extends Thread {
             } catch (InterruptedException e) {
                 break;
             }
+        }
+    }
+
+    private DatagramSocket getSocket() {
+        try {
+            return new DatagramSocket(NetParams.PORT);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not create socket", e);
+        }
+    }
+
+    private void receive() {
+        try {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            socket.receive(packet);
+            listener.onData(packet.getData());
+        } catch (IOException e) {
+            Logger.warning("Exception occurred during packet receive", e);
         }
     }
 

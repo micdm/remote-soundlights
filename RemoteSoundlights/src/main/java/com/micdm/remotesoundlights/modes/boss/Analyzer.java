@@ -92,6 +92,8 @@ public class Analyzer {
 
     private BeatDetector[] detectors = new BeatDetector[LEVEL.values().length];
     private OnPeakListener listener;
+    private double[] levels;
+    private double[] energies = new double[FREQUENCIES.length - 1];
 
     public Analyzer(OnPeakListener listener) {
         initDetectors();
@@ -109,7 +111,9 @@ public class Analyzer {
     }
 
     private double[] getFrequencyLevels(byte[] data) {
-        double[] levels = new double[data.length / 2];
+        if (levels == null) {
+            levels = new double[data.length / 2];
+        }
         levels[0] = getFrequencyLevel(data[0], (byte) 0);
         for (int i = 1; i < levels.length - 1; i += 1) {
             levels[i] = getFrequencyLevel(data[i * 2], data[i * 2 + 1]);
@@ -133,7 +137,6 @@ public class Analyzer {
     }
 
     private double[] getEnergies(double[] levels) {
-        double[] energies = new double[FREQUENCIES.length - 1];
         for (int i = 0; i < FREQUENCIES.length - 1; i += 1) {
             energies[i] = getEnergy(levels, FREQUENCIES[i], FREQUENCIES[i + 1]);
         }
