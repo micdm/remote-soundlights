@@ -33,13 +33,7 @@ public class ResourceRegistry {
 
     private static String getTextureDirectory(Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        if (metrics.densityDpi >= DisplayMetrics.DENSITY_XHIGH) {
-            return "xhigh";
-        }
-        if (metrics.densityDpi >= DisplayMetrics.DENSITY_HIGH) {
-            return "high";
-        }
-        return "medium";
+        return metrics.densityDpi >= DisplayMetrics.DENSITY_HIGH ? "high" : "medium";
     }
 
     private static BitmapTexture loadTexture(Context context, Engine engine, String name) {
