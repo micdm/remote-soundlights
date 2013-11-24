@@ -35,7 +35,8 @@ public class FlashlightController {
 
     public boolean isActive() {
         Camera.Parameters params = camera.getParameters();
-        return params.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
+        String mode = params.getFlashMode();
+        return mode != null && mode.equals(Camera.Parameters.FLASH_MODE_TORCH);
     }
 
     public void activate() {

@@ -19,6 +19,7 @@ class VisualizerWatcher {
 
     public void init() {
         visualizer = new Visualizer(0);
+        visualizer.setEnabled(false);
         int[] range = Visualizer.getCaptureSizeRange();
         visualizer.setCaptureSize(range[1]);
         visualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
